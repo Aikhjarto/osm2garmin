@@ -2,3 +2,6 @@
 
 () Add Bugs. Since gary68 quitted his service, and Openstreetbugs don't provied a usefull export, no bugs are shown in the map.
 
+() add a switch that enables/disables complete-ways (for much faster but more inaccure cropping)
+
+() have a try on OSM-history-splitter (should be able to crop data faster than osmosis)
