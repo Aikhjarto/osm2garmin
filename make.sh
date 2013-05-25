@@ -68,21 +68,21 @@ GMAPOUT_DIR="."
 # Which map should be build?
 
 # Austria
-#GEOFABRIK_CONTINENT_NAME="europe"
-#GEOFABRIK_MAP_NAME="austria"
-#COUNTRY_NAME="Austria"
-#COUNTRY_ABBR="AT"
-#MAP_GRP="8324" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
-#ISO="AT" # iso abbreviation of country
+GEOFABRIK_CONTINENT_NAME="europe"
+GEOFABRIK_MAP_NAME="austria"
+COUNTRY_NAME="Austria"
+COUNTRY_ABBR="AT"
+MAP_GRP="8324" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
+ISO="AT" # iso abbreviation of country
 #POLY="UpperAustria"
 
 # Cut out a piece of Europe
-GEOFABRIK_MAP_NAME="europe-latest"
-COUNTRY_NAME="CentralEurope"
-COUNTRY_ABBR="EU"
-MAP_GRP="6800"
-ISO="EU"
-POLY="central_europe3"
+#GEOFABRIK_MAP_NAME="europe-latest"
+#COUNTRY_NAME="CentralEurope"
+#COUNTRY_ABBR="EU"
+#MAP_GRP="6800"
+#ISO="EU"
+#POLY="central_europe3"
 
 # Germany
 #GEOFABRIK_CONTINENT_NAME="europe"
@@ -123,6 +123,8 @@ OSMCONVERT_WORKDIR="$TEMP_DIR/osmconvert_tmp"
 
 #
 KEEP_TMP_FILE="" # if this string is empty, the temporary files will be kept
+ENABLE_PRECISE_CROP=""
+ENABLE_BOUNDS="" # needed for address search capabilty
 
 # command to import split files in mkgmap
 # Caution: with -c option in an un-preprocessed template.args file a lot of command line settings can be overwritten
@@ -180,18 +182,16 @@ if [ ! -s $OSM_SRC_FILE_O5M ] || [ ! -s $OSM_SRC_FILE_PBF ]; then
 #			wget -O - $DOWNLOAD_URL  | \
 #				tee $OSM_SRC_FILE_PBF | \
 #				$OSMCONVERT_BIN - $DEBUG_OSMCONVERT -t=$OSMCONVERT_WORKDIR -o=$OSM_SRC_FILE_O5M
-			OSM_WGET_TMP_FILE=$TEMP_DIR/osmcopy/wget_tmp.osm.pbf
+#			OSM_WGET_TMP_FILE=$TEMP_DIR/osmcopy/wget_tmp.osm.pbf
+			OSM_WGET_TMP_FILE=$OSM_SRC_FILE_PBF;
 			if [ ! -f $OSM_WGET_TMP_FILE ]; then
 				wget -O $OSM_WGET_TMP_FILE $DOWNLOAD_URL 
-				if [ ! $? -ne 0 ]; then
+				if [ $? -ne 0 ]; then
 					echo "ERROR: Download of $DOWNLOAD_URL to $OSM_WGET_TMP_FILE failed"
 					exit
 				fi
 			fi
 			
-			$OSMCONVERT_BIN $OSM_WGET_TMP_FILE $DEBUG_OSMCONVERT -t=$OSMCONVERT_WORKDIR/tmp -o=$OSM_SRC_FILE_O5M
-			[ $? -ne 0 ] && ( echo "ERROR while converting pbf input to o5m for boundaries failed!"; exit ) 
-
 		else
 			echo "------>download PBF and convert with a cropping polygon"
 			# complete-ways cannot be used then reading from incomplete file, so file is downloaded first. Then the polygon is applied and in parallel the file is converted to o5m
@@ -223,8 +223,15 @@ if [ ! -s $OSM_SRC_FILE_O5M ] || [ ! -s $OSM_SRC_FILE_PBF ]; then
 			else
 				rm $TEMP_DIR/osmosis/*
 			fi		
+			
+			if [ ! -z ENABLE_PRECISE_CROP ]; then
+				$OSMOSIS_POLY_OPTIONS="completeWays=yes completeRelations=yes"
+			else
+				$OSMOSIS_POLY_OPTONS=""
+			fi
+			
  			$OSMOSIS_BIN $DEBUG_OSMOSIS --read-pbf-fast file="$OSM_WGET_TMP_FILE" \
- 				--bounding-polygon file="$POLY_DIR/$POLY.poly" completeWays=yes completeRelations=yes \
+ 				--bounding-polygon file="$POLY_DIR/$POLY.poly" $OSMOSIS_POLY_OPTIONS \
  				--write-pbf file="$OSM_SRC_FILE_PBF"
 #			OSMCONVERT_CUT_OPTIONS="-B=$POLY_DIR/$POLY.poly --complete-ways --complex-ways"
 #			$OSMCONVERT_BIN $OSM_WGET_TMP_FILE $DEBUG_OSMCONVERT $OSMCONVERT_CUT_OPTIONS -t=$OSMCONVERT_WORKDIR/tmp -o=$OSM_SRC_FILE_PBF
@@ -256,69 +263,77 @@ fi
 # TODO: o5M file is only needed for creating boundaries. Osmfilter, which extracts the boundaries can not read pbf right now. Osmosis could but is much slower than osmfilter
 
 echo "------------------->osmfilter (generate boundary files)"
-if [ $OSM_SRC_FILE_PBF -nt $BOUNDS_STAT_FILE ]; then
-	if [ ! -d $BOUNDS_DIR ]; then
-	  mkdir -p $BOUNDS_DIR
-	fi
-	
-	# convert from pbf to o5m since osmfilter does only understand o5m format
-	# caution o5m format needs about twice the harddisk-space of the pbf format
-	if [ $OSM_SRC_FILE_PBF -nt $OSM_SRC_FILE_O5M ] || [ ! -s $OSM_SRC_FILE_O5M ]; then
-		echo "---------->convert to o5m @"`date`
-		$OSMCONVERT_BIN $DEBUG_OSMCONVERT -t=$OSMCONVERT_WORKDIR/tmp $OSM_SRC_FILE_PBF --out-o5m -o=$OSM_SRC_FILE_O5M
-		if [ $? -ne 0 ]; then 
-			echo "ERROR while converting pbf input to o5m for boundaries failed! "`date`
-			exit
-		else
-			echo `du -hs $OSM_SRC_FILE_O5M`
-		fi 
-	fi
-	
-	# Cannot pipeline pbf to o5m convertion with filtering bounds since osmfilter needs random access to it's inputs.		
-	echo "---------------------> extracting bounds info from map @"`date`
-	if [ $OSM_SRC_FILE_O5M -nt $BOUNDS_FILE.o5m ]; then
-		# extract boundary information from source 
-		$OSMFILTER_BIN $OSM_SRC_FILE_O5M $DEBUG_OSMFILTER -t=$TEMP_DIR/osmfilter_temp --keep-nodes= \
-			--keep-ways-relations="boundary=administrative =postal_code postal_code=" \
-			-o=$BOUNDS_FILE.o5m
-		if [ $? -ne 0 ]; then
-			echo "ERROR while filtering boundaries @"`date`
-			exit
-		else
-			echo `du -hs $BOUNDS_FILE.o5m`
-			
+if [ ! -z $ENABLE_BOUNDS ]; then
+	if [ $OSM_SRC_FILE_PBF -nt $BOUNDS_STAT_FILE ]; then
+		if [ ! -d $BOUNDS_DIR ]; then
+		  mkdir -p $BOUNDS_DIR
 		fi
-	fi
 		
-	### convert to *.bnd files
-	echo "--------------------->creating bounds folder for mkgmap @"`date`
-	rm $BOUNDS_DIR/* # delete old files
-#	$JAVA_BIN $XmxRAM -jar $MKGMAP_JAR --max-jobs --verbose \
-#		--bounds=$BOUNDS_DIR --createboundsfile=$BOUNDS_FILE.pbf
-	$JAVA_BIN $XmxRAM -cp $MKGMAP_JAR uk.me.parabola.mkgmap.reader.osm.boundary.BoundaryPreprocessor \
-		$BOUNDS_FILE.o5m \
-		$BOUNDS_DIR	
-	if [ $? -ne 0 ]; then
-		echo "ERROR while generating boundary file @"`date`
-		exit
+		# convert from pbf to o5m since osmfilter does only understand o5m format
+		# caution o5m format needs about twice the harddisk-space of the pbf format
+		if [ $OSM_SRC_FILE_PBF -nt $OSM_SRC_FILE_O5M ] || [ ! -s $OSM_SRC_FILE_O5M ]; then
+			echo "---------->convert to o5m @"`date`
+			$OSMCONVERT_BIN $DEBUG_OSMCONVERT -t=$OSMCONVERT_WORKDIR/tmp $OSM_SRC_FILE_PBF --out-o5m -o=$OSM_SRC_FILE_O5M
+			if [ $? -ne 0 ]; then 
+				echo "ERROR while converting pbf input to o5m for boundaries failed! "`date`
+				exit
+			else
+				echo `du -hs $OSM_SRC_FILE_O5M`
+			fi 
+		fi
+		
+		# Cannot pipeline pbf to o5m convertion with filtering bounds since osmfilter needs random access to it's inputs.		
+		echo "---------------------> extracting bounds info from map @"`date`
+		if [ $OSM_SRC_FILE_O5M -nt $BOUNDS_FILE.o5m ]; then
+			# extract boundary information from source 
+			$OSMFILTER_BIN $OSM_SRC_FILE_O5M $DEBUG_OSMFILTER -t=$TEMP_DIR/osmfilter_temp --keep-nodes= \
+				--keep-ways-relations="boundary=administrative =postal_code postal_code=" \
+				-o=$BOUNDS_FILE.o5m
+			if [ $? -ne 0 ]; then
+				echo "ERROR while filtering boundaries @"`date`
+				exit
+			else
+				echo `du -hs $BOUNDS_FILE.o5m`
+				
+			fi
+		fi
+			
+		### convert to *.bnd files
+		echo "--------------------->creating bounds folder for mkgmap @"`date`
+		rm $BOUNDS_DIR/* # delete old files
+	#	$JAVA_BIN $XmxRAM -jar $MKGMAP_JAR --max-jobs --verbose \
+	#		--bounds=$BOUNDS_DIR --createboundsfile=$BOUNDS_FILE.pbf
+		$JAVA_BIN $XmxRAM -cp $MKGMAP_JAR uk.me.parabola.mkgmap.reader.osm.boundary.BoundaryPreprocessor \
+			$BOUNDS_FILE.o5m \
+			$BOUNDS_DIR	
+		if [ $? -ne 0 ]; then
+			echo "ERROR while generating boundary file @"`date`
+			exit
+		else
+			echo `du -hs $BOUNDS_DIR`
+		fi
+	
+		### cleanup 
+		echo "finished boundary processing @"`date` | tee $BOUNDS_STAT_FILE
+		if [ "$KEEP_TMP_FILE" != "" ]; then
+			rm $OSM_SRC_FILE_O5M # delete o5m input file since only the pbf is used further
+		fi
 	else
-		echo `du -hs $BOUNDS_DIR`
+		echo "Already there!"
 	fi
-
-	### cleanup 
-	echo "finished boundary processing @"`date` | tee $BOUNDS_STAT_FILE
-	if [ "$KEEP_TMP_FILE" != "" ]; then
-		rm $OSM_SRC_FILE_O5M # delete o5m input file since only the pbf is used further
-	fi
+	MKGMAP_OPTION_BOUNDS="--index --location-autofill=bounds --bounds=$BOUNDS_DIR";
 else
-	echo "Already there!"
+	echo "Bounds not needed!"
+	MKGMAP_OPTION_BOUNDS=""
+	
 fi
 
 
 ### split map to reduce overall memory consumption
 echo "-------------------->splitter @"`date`
 SPLITTER_STAT_FILE=$TEMP_DIR/splitter_finished
-if [ $OSM_SRC_FILE_PBF -nt $SPLITTER_STAT_FILE ]; then 
+echo "$SPLITTER_STAT_FILE -nt $OSM_SRC_FILE_PBF"
+if [ ! $SPLITTER_STAT_FILE -nt $OSM_SRC_FILE_PBF ]; then 
 	if [ ! -d $SPLITTER_DIR ]; then
 		mkdir -p $SPLITTER_DIR
 		if [ $? -ne 0 ]; then
@@ -358,7 +373,7 @@ if [ $OSM_SRC_FILE_PBF -nt $BASEMAP_DIR/gmapsupp.img ]; then
 		--mapname="$MAP_GRP"0001 --draw-priority=10 --add-pois-to-areas \
 		--make-all-cycleways \
 		--link-pois-to-ways --net --route --drive-on-right \
-		--index --location-autofill=bounds --bounds=$BOUNDS_DIR \
+		$MKGMAP_OPTION_BOUNDS \
 		--gmapsupp $TYP_DIR/basemap.TYP \
 		--output-dir=$BASEMAP_DIR/ \
 		$MKGMAP_FILE_IMPORT
@@ -389,7 +404,7 @@ if [ $OSM_SRC_FILE_PBF -nt $PKW_DIR/gmapsupp.img ]; then
 		--series-name="OSM-AllInOne-$ISO-pkw" --family-name=OSM_PKW --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"0001 --draw-priority=10 --add-pois-to-areas \
 		--link-pois-to-ways --net --route --drive-on-right \
-		--index --location-autofill=bounds --bounds=$BOUNDS_DIR \
+		$MKGMAP_OPTION_BOUNDS \
 		--gmapsupp $TYP_DIR/pkw.TYP \
 		--output-dir=$PKW_DIR \
 		$MKGMAP_FILE_IMPORT
@@ -578,7 +593,7 @@ if [ "$KEEP_TMP_FILES" != "" ]; then
 	rm $ADDR_DIR
 	rm $FIXME_DIR
 	rm $MAXSPEED_DIR
-	rm $BOUNDARY_DIR
+	[ ! -z $ENABLE_BOUNDS ] && rm $BOUNDARY_DIR;
 	rm $OSMCONVERT_WORKDIR
 	rm -rf $TEMP_DIR/osmcopy/
 	rm -rf $TEMP_DIR/osmosis/
