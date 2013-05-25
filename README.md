@@ -56,3 +56,7 @@ Note on Hardware Demands
 
 Keep in mind that processing large portions (several countries or even a whole component) of OpenStreeMap data can heavily stress your system. Your free RAM should be larger than your source *.pdf and your temporary folder should be able to hold about 5 times the size of the source *.pbf file. Once you meet these requirements, you should also considere that it will most probably take server hours of CPU time to crop, filter and convert the OSM data.
 
+Disclaimer
+==========
+
+The files in this project are distributed WITHOUT ANY WARRANTY and  WITHOUT ANY IMPLIED WARRANTY.
