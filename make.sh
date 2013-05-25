@@ -391,7 +391,7 @@ echo "-------------------->gpkw @"`date`
 if [ $OSM_SRC_FILE_PBF -nt $PKW_DIR/gmapsupp.img ]; then
 	if [ ! -d $PKW_DIR ]; then
 		mkdir -p $PKW_DIR
-		if [ $? -ne 0]; then
+		if [ $? -ne 0 ]; then
 			echo "ERROR creating $PKW_DIR"
 			exit
 		fi
