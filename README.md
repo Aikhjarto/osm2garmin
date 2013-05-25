@@ -34,6 +34,7 @@ MKGMAP will require style files. These files hold rules how OSM object IDs shoul
 * https://github.com/berndw1960/aiostyles
 * http://wiki.openstreetmap.org/wiki/User:Computerteddy
 
+If you want to modify the styles yourself, you can find an explanation of the syntac here: http://wiki.openstreetmap.org/wiki/Mkgmap/help/style_rules#Element_type_definition
 
 TYP files define the look (shape, color) how items (streets, buildings, POI, landscape,...) are displayed on your Garmin device.
 There are serveral sources like
