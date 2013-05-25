@@ -6,7 +6,41 @@ provides a script for converting openstreetmap data to garmin's img-format
 Dependencies
 ============
 
-There are several dependencies. See the parameter section in the beginning of make.sh for explanations.
+This script has to type of dependencies. Firstly, it needs auxiliary scripts and programs. Secondly, it needs auxiliary (beside osm) data. Great thanks to the people who developed those.
+
+Auxiliary programs
+------------------
+This script makes use of well developed applications for processing, filtering and modifing OSM data. 
+
+* splitter (splits up huge input files in manageable parts) from http://www.mkgmap.org.uk/splitter/
+* gmt (combines submaps to a single file) from http://www.gmaptool.eu/
+* mkgmap (converts OSM data to garmin's file format) from http://www.mkgmap.org.uk/snapshots/
+* osmfilter (used for boundary calculation; needed for address searches) from http://wiki.openstreetmap.org/wiki/Osmfilter
+* osmconvert (converter between nearly all important OSM data formats) from http://wiki.openstreetmap.org/wiki/Osmconvert
+* osmosis (used for cropping data) http://wiki.openstreetmap.org/wiki/Osmosis
+
+
+Auxiliary data
+--------------
+MKGMAP will require style files. These files hold rules how OSM object IDs should be translated to garmin object IDs. Possible sources include:
+
+* https://github.com/berndw1960/aiostyles
+* http://wiki.openstreetmap.org/wiki/User:Computerteddy
+
+
+TYP files define the look (shape, color) how items (streets, buildings, POI, landscape,...) are displayed on your garmin device.
+There are serveral sources like
+
+* http://www.avdweb.nl/gps/garmin/improved-garmin-map-view-with-typ-files.html
+* http://www.cferrero.net/maps/guide_to_TYPs.html
+* http://pinns.co.uk/osm/typwiz3.html
+* http://wiki.openstreetmap.org/wiki/User:Computerteddy
+
+There are also several editor for TYP-files our there:
+* http://ati.land.cz/gps/typedit/editor.cgi
+* http://pinns.co.uk/osm/typwiz3.html
+
+See the parameter section in the beginning of make.sh for explanations.
 
 Usage
 =====

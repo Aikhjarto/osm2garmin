@@ -47,11 +47,12 @@ NICE_VAL="9" # values higher than 0 will reduce processor priority
 SPLITTER_MAX_NODES=1000000 # maximum number of nodes per file (splitter will split the whole map in according to this number)
 
 # jar files and binaries locations
-# splitter from http://www.mkgmap.org.uk/splitter/
-# gmt from http://www.gmaptool.eu/
-# mkgmap from http://www.mkgmap.org.uk/snapshots/
-# osmfilter from http://wiki.openstreetmap.org/wiki/Osmfilter
-# osmconvert from http://wiki.openstreetmap.org/wiki/Osmconvert
+# splitter (splits up huge input files in manageable parts) from http://www.mkgmap.org.uk/splitter/
+# gmt (combines submaps to a single file) from http://www.gmaptool.eu/
+# mkgmap (converts OSM data to garmin's file format) from http://www.mkgmap.org.uk/snapshots/
+# osmfilter (used for boundary calculation; needed for address searches) from http://wiki.openstreetmap.org/wiki/Osmfilter
+# osmconvert (converter between nearly all important OSM data formats) from http://wiki.openstreetmap.org/wiki/Osmconvert
+# osmosis (used for cropping data) http://wiki.openstreetmap.org/wiki/Osmosis
 SPLITTER_JAR="$APPS_DIR/splitter/splitter-r302/splitter.jar"
 MKGMAP_JAR="$APPS_DIR/mkgmap/mkgmap-r2572/mkgmap.jar"
 OSMFILTER_BIN="nice -n $NICE_VAL $APPS_DIR/osmfilter/osmfilter-1.2S/osmfilter"
