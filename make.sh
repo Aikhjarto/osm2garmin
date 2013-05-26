@@ -60,6 +60,7 @@ OSMCONVERT_BIN="$APPS_DIR/osmconvert/osmconvert-0.7P/osmconvert"
 GMT_BIN="$APPS_DIR/lgmt/lgmt08067/gmt"
 JAVA_BIN="/usr/bin/java"
 OSMOSIS_BIN="$APPS_DIR/osmosis/osmosis-0.43.1/bin/osmosis"
+OSBSQL_BIN="$APPS_DIR/osbsql2osm/osbsql2osm-0.3.1/src/osbsql2osm"
 
 # output folder (use "." for current folder)
 GMAPOUT_DIR="."
@@ -160,20 +161,26 @@ if [ ! -f $MKGMAP_JAR ]; then
 	exit
 fi
 if [ ! -x $OSMFILTER_BIN ]; then
-	echo "ERROR: $OSMFILTER_START is no executable file"
+	echo "ERROR: $OSMFILTER_BIN is no executable file"
 	exit
 fi
 if [ ! -x $OSMCONVERT_BIN ]; then
-	echo "ERROR: $OSMCONVERT_START is no executable file"
+	echo "ERROR: $OSMCONVERT_BIN is no executable file"
 	exit
 fi
 if [ ! -x $GMT_START ]; then
-	echo "ERROR: $GMT_START is no executable file"
+	echo "ERROR: $GMT_BIN is no executable file"
 	exit
 fi
 if [ ! -x $OSMOSIS_BIN ]; then
-	echo "ERROR: $OSMOSIS_START is no executable file"
+	echo "ERROR: $OSMOSIS_BIN is no executable file"
 	exit
+fi
+if [ ! -x $OSBSQL_BIN ]; then
+	echo "WARNING: $OSBSQL_BIN not found! Bugs will not be shown on map!"
+	OSBSQL_START=""
+else
+	OSBSQL_START="nice -n $NICE_VAL $OSBSQL_BIN"
 fi
 
 # set nice values
@@ -587,7 +594,7 @@ fi
 
 ### Max Speed (as osm is not fully populated with speed limity, you might want a seperate map to hide them)
 echo "-------------------->gmaxspeed @"`date`
-if [ $OSM_SRC_FILE_PBF -nt $MAXSPEED_DIR/gmapsupp.img ]; then
+if false && [ $OSM_SRC_FILE_PBF -nt $MAXSPEED_DIR/gmapsupp.img ]; then
 	if [ ! -d $MAXSPEED_DIR ]; then
 		mkdir -p $MAXSPEED_DIR
 		if [ $? -ne 0 ]; then
@@ -613,19 +620,83 @@ else
 	echo "Alread there!"
 fi
 
-### Bugs (outdated, can't find a good source right now)
-# Maybe openstreetbugs is available again: wget -O - http://openstreetbugs.schokokeks.org/dumps/osbdump_latest.sql.bz2 | bunzip2 > temp/osbdump_lastet.sql
-#echo "-------------------->gosb"
-#if [ ! -d $BUGS_DIR ]; then
-#  mkdir -p $BUGS_DIR
-#fi
-#echo "OSM-Bugs"
-#$JAVA_START $XmxRAM -jar $MKGMAP_JAR $DEBUG_MKMAP --max-jobs --style-file=$AIOSTYLES_DIR/osb_style/ --description='Openstreetbugs' \
-#	--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=3 --product-id=33 \
-#	--series-name="OSM-AllInOne-$ISO-OSB" --family-name=OSB --area-name=EU --latin1 \
-#	--mapname="$MAP_GRP"3345 --draw-priority=23 --no-poi-address --transparent \
-#	--gmapsupp $ALLBUGS_OSM $AIOSTYLES_DIR/osb.TYP \
-#	--output-dir=$BUGS_DIR
+### Bugs from openstreetbugs
+echo "----------------------> gosb @"`date`
+if [ ! -z $OSBSQL_BIN ]; then
+	echo "-------------------->gosb"
+	if [ $OSM_SRC_FILE_PBF -nt $BUGS_DIR/gmapsupp.img ]; then 
+		if [ ! -d $BUGS_DIR ]; then
+			mkdir -p $BUGS_DIR
+			if [ $? -ne 0 ]; then
+				echo "ERROR creating $BUGS_DIR"
+				exit
+			fi
+		else
+			rm $BUGS_DIR/*
+		fi
+		
+		ALLBUGS_OSM="$OSM_SRC_DIR/osb.osm"
+		ALLBUGS_PBF="$OSM_SRC_DIR/osb.pbf"
+		ALLBUGS_STATE_FILE="$OSM_SRC_DIR/osb.state"
+
+		echo "----> Download OSB"
+		if [ ! "$ALLBUGS_STATE_FILE" -nt "$OSM_SRC_FILE_PBF" ]; then
+			wget -O - http://openstreetbugs.schokokeks.org/dumps/osbdump_latest.sql.bz2 | nice -n $NICE_VAL bunzip2 | $OSBSQL_START > $ALLBUGS_OSM
+			if [ $? -ne 0 ]; then
+				echo "ERROR downloading OSB"
+				exit
+			else
+				# write state file (to detect whether or not download was interrupted with STRG-C (not detectable via return value)
+				echo "successfull downloaded @"`date` >> "$ALLBUGS_STATE_FILE"
+			fi
+		else
+			echo "Alread there!"
+		fi
+
+		if [ "$POLY" == "" ]; then
+			$OSMOSIS_START $DEBUG_OSMOSIS --read-xml file="$ALLBUGS_OSM" \
+				--sort \
+				--write-pbf file="$ALLBUGS_PBF"
+			if [ $? -ne 0 ]; then
+				echo "ERROR converting OSB file!"
+				exit
+			fi
+		else
+			# HINT: can't use osmconvert to crop polygon since OSB data is not sorted (osmconvert need sorted data)
+			$OSMOSIS_START $DEBUG_OSMOSIS --read-xml file="$ALLBUGS_OSM" \
+				--sort \
+ 				--bounding-polygon file="$POLY_DIR/$POLY.poly" $OSMOSIS_POLY_OPTIONS \
+ 				--write-pbf file="$ALLBUGS_PBF"
+ 			if [ $? -ne 0 ]; then
+				echo "ERROR applying polygon to OSB file!"
+				exit
+			fi
+		fi
+		
+		$JAVA_START $XmxRAM -jar $SPLITTER_JAR \
+		--mapid="$MAP_GRP"0345 --max-nodes=$SPLITTER_MAX_NODES --keep-complete=true \
+		--output-dir=$BUGS_DIR --write-kml=areas.kml $ALLBUGS_PBF
+		
+		$JAVA_START $XmxRAM -jar $MKGMAP_JAR $DEBUG_MKMAP --max-jobs --style-file=$AIOSTYLES_DIR/osb_style/ --description='Openstreetbugs' \
+			--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=3 --product-id=33 \
+			--series-name="OSM-AllInOne-$ISO-OSB" --family-name=OSB --area-name=EU --latin1 \
+			--mapname="$MAP_GRP"3345 --draw-priority=23 --no-poi-address --transparent \
+			--gmapsupp $AIOSTYLES_DIR/osb.TYP \
+			--output-dir=$BUGS_DIR \
+			$BUGS_DIR/*.pbf
+
+		echo `du -hs $BUGS_DIR` " " `du -hs $BUGS_DIR/gmapsupp.img`
+		if [ $? -ne 0 ]; then
+			exit
+		fi
+		if [ "$KEEP_TMP_FILE" != "" ]; then
+			rm $BUGS_DIR/$MAP_GRP*.img # clean up, since mkgmap does not
+			rm $ALLBUGS_OSM
+		fi
+	else
+		echo "Already there!"
+	fi
+fi
 
 ### purge splitted files (only *.img files are needed further)
 if [ "$KEEP_TMP_FILE" != "" ]; then
@@ -638,17 +709,22 @@ fi
 ### Merge individual maps to a single *.img file
 echo "-------------------->merge @"`date`
 if [ ! -d $GMAPOUT_DIR ]; then
-  mkdir -p $GMAPOUT_DIR
+	mkdir -p $GMAPOUT_DIR
 fi
 
+if [ ! -z $OSBSQL_BIN ]; then
+#	OSB_MERGE="$BUGS_DIR/gmapsupp.img"
+else
+	OSB_MERGE=""
+fi
 echo "-->Basemap @"`date`
 if [ $OSM_SRC_FILE_PBF -nt $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_base.img ]; then
 	$GMT_START -jo $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_base.img \
 		$BASEMAP_DIR/gmapsupp.img \
 		$ADDR_DIR/gmapsupp.img \
-		$FIXME_DIR/gmapsupp.img \
+		$FIXME_DIR/gmapsupp.img $OSB_MERGE \
 		$MAXSPEED_DIR/gmapsupp.img \
-		$BOUNDARY_DIR/gmapsupp.img
+		$BOUNDARY_DIR/gmapsupp.img		
 else
 	echo "Already there!"
 fi 
@@ -658,7 +734,7 @@ if [ $OSM_SRC_FILE_PBF -nt $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_bike.img ]; the
 	$GMT_START -jo $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_bike.img \
 		$BIKE_DIR/gmapsupp.img \
 		$ADDR_DIR/gmapsupp.img \
-		$FIXME_DIR/gmapsupp.img \
+		$FIXME_DIR/gmapsupp.img $OSB_MERGE \
 		$MAXSPEED_DIR/gmapsupp.img \
 		$BOUNDARY_DIR/gmapsupp.img
 else
@@ -671,7 +747,7 @@ if [ $OSM_SRC_FILE_PBF -nt $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_pkw.img ]; then
 	$GMT_START -jo $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_pkw.img \
 		$PKW_DIR/gmapsupp.img \
 		$ADDR_DIR/gmapsupp.img \
-		$FIXME_DIR/gmapsupp.img \
+		$FIXME_DIR/gmapsupp.img $OSB_MERGE \
 		$MAXSPEED_DIR/gmapsupp.img \
 		$BOUNDARY_DIR/gmapsupp.img
 else
@@ -690,6 +766,7 @@ if [ "$KEEP_TMP_FILES" != "" ]; then
 	rm $ADDR_DIR
 	rm $FIXME_DIR
 	rm $MAXSPEED_DIR
+	[ ! -z $OSBSQL ] && rm $BUGS_DIR;
 	[ ! -z $ENABLE_BOUNDS ] && rm $BOUNDARY_DIR;
 	rm $OSMCONVERT_WORKDIR
 	rm -rf $TEMP_DIR/osmcopy/
