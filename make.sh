@@ -69,21 +69,21 @@ GMAPOUT_DIR="."
 # Which map should be build?
 
 # Austria
-#GEOFABRIK_CONTINENT_NAME="europe"
-#GEOFABRIK_MAP_NAME="austria"
-#COUNTRY_NAME="Austria"
-#COUNTRY_ABBR="AT"
-#MAP_GRP="8324" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
-#ISO="AT" # iso abbreviation of country
-#POLY="UpperAustria"
+GEOFABRIK_CONTINENT_NAME="europe"
+GEOFABRIK_MAP_NAME="austria"
+COUNTRY_NAME="Austria"
+COUNTRY_ABBR="AT"
+MAP_GRP="8324" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
+ISO="AT" # iso abbreviation of country
+POLY="UpperAustria"
 
 # Cut out a piece of Europe
-GEOFABRIK_MAP_NAME="europe-latest"
-COUNTRY_NAME="AustriaVicinity"
-COUNTRY_ABBR="EU"
-MAP_GRP="6800"
-ISO="EU"
-POLY="Austria_Vicinity"
+#GEOFABRIK_MAP_NAME="europe-latest"
+#COUNTRY_NAME="AustriaVicinity"
+#COUNTRY_ABBR="EU"
+#MAP_GRP="6800"
+#ISO="EU"
+#POLY="Austria_Vicinity"
 
 # Germany
 #GEOFABRIK_CONTINENT_NAME="europe"
@@ -764,6 +764,10 @@ if [ $OSM_SRC_FILE_PBF -nt $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_base.img ]; the
 		$FIXME_DIR/gmapsupp.img $OSB_MERGE \
 		$MAXSPEED_DIR/gmapsupp.img \
 		$BOUNDARY_DIR/gmapsupp.img		
+	if [ $? -ne 0 ]; then
+		echo "ERROR merging basemap!"
+		exit
+	fi
 else
 	echo "Already there!"
 fi 
@@ -776,6 +780,10 @@ if [ $OSM_SRC_FILE_PBF -nt $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_bike.img ]; the
 		$FIXME_DIR/gmapsupp.img $OSB_MERGE \
 		$MAXSPEED_DIR/gmapsupp.img \
 		$BOUNDARY_DIR/gmapsupp.img
+	if [ $? -ne 0 ]; then
+		echo "ERROR merging bike map!"
+		exit
+	fi
 else
 	echo "Already there!"
 fi
@@ -789,6 +797,10 @@ if [ $OSM_SRC_FILE_PBF -nt $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_pkw.img ]; then
 		$FIXME_DIR/gmapsupp.img $OSB_MERGE \
 		$MAXSPEED_DIR/gmapsupp.img \
 		$BOUNDARY_DIR/gmapsupp.img
+	if [ $? -ne 0 ]; then
+		echo "ERROR merging PKW map!"
+		exit
+	fi
 else
 	echo "Already there!"
 fi
