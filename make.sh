@@ -42,7 +42,7 @@ POLY_DIR=$HOME"/osm/poly"
 #TEMP_DIR="$HOME/noBackup/osmtemp"
 TEMP_DIR=/pub/tmp/osmtemp
 XmxRAM="-Xmx2048M" # max ram available to java for splitter and mkgmap
-export JAVACMD_OPTIONS="-Xmx2G -server -Djava.io.tmpdir=$TEMP_DIR/osmosis" # java options for osmosis
+export JAVACMD_OPTIONS="-Xmx3G -server -Djava.io.tmpdir=$TEMP_DIR/osmosis" # java options for osmosis
 NICE_VAL="9" # values higher than 0 will reduce processor priority
 SPLITTER_MAX_NODES=1000000 # maximum number of nodes per file (splitter will split the whole map in according to this number)
 
@@ -68,21 +68,21 @@ GMAPOUT_DIR="."
 # Which map should be build?
 
 # Austria
-GEOFABRIK_CONTINENT_NAME="europe"
-GEOFABRIK_MAP_NAME="austria"
-COUNTRY_NAME="Austria"
-COUNTRY_ABBR="AT"
-MAP_GRP="8324" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
-ISO="AT" # iso abbreviation of country
+#GEOFABRIK_CONTINENT_NAME="europe"
+#GEOFABRIK_MAP_NAME="austria"
+#COUNTRY_NAME="Austria"
+#COUNTRY_ABBR="AT"
+#MAP_GRP="8324" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
+#ISO="AT" # iso abbreviation of country
 #POLY="UpperAustria"
 
 # Cut out a piece of Europe
-#GEOFABRIK_MAP_NAME="europe-latest"
-#COUNTRY_NAME="CentralEurope"
-#COUNTRY_ABBR="EU"
-#MAP_GRP="6800"
-#ISO="EU"
-#POLY="central_europe3"
+GEOFABRIK_MAP_NAME="europe-latest"
+COUNTRY_NAME="AustriaVicinity"
+COUNTRY_ABBR="EU"
+MAP_GRP="6800"
+ISO="EU"
+POLY="Austria_Vicinity"
 
 # Germany
 #GEOFABRIK_CONTINENT_NAME="europe"
@@ -97,9 +97,9 @@ ISO="AT" # iso abbreviation of country
 
 # debug flags (set to empty string "" for disabling debug output)
 DEBUG_MKMAP="--verbose --list-styles"
-DEBUG_OSMCONVERT="--verbose --statistics"
-DEBUG_OSMFILTER="--verbose"
-DEBUG_OSMOSIS="-v"
+#DEBUG_OSMCONVERT="--verbose --statistics"
+#DEBUG_OSMFILTER="--verbose"
+#DEBUG_OSMOSIS="-v"
 
 ## parition the temporary directory
 # temporary folders for separate maps
@@ -123,8 +123,8 @@ OSMCONVERT_WORKDIR="$TEMP_DIR/osmconvert_tmp"
 
 #
 KEEP_TMP_FILE="" # if this string is empty, the temporary files will be kept
-ENABLE_PRECISE_CROP=""
-ENABLE_BOUNDS="" # needed for address search capabilty
+ENABLE_PRECISE_CROP="y" # if string is not empty, "complete-ways" well be activated
+ENABLE_BOUNDS="y" # needed for address search capabilty
 
 # command to import split files in mkgmap
 # Caution: with -c option in an un-preprocessed template.args file a lot of command line settings can be overwritten
@@ -224,10 +224,12 @@ if [ ! -s $OSM_SRC_FILE_O5M ] || [ ! -s $OSM_SRC_FILE_PBF ]; then
 				rm $TEMP_DIR/osmosis/*
 			fi		
 			
-			if [ ! -z ENABLE_PRECISE_CROP ]; then
-				$OSMOSIS_POLY_OPTIONS="completeWays=yes completeRelations=yes"
+			if [ ! -z $ENABLE_PRECISE_CROP ]; then
+				echo "->Precise cropping enabled!"
+				OSMOSIS_POLY_OPTIONS="completeWays=yes completeRelations=yes"
 			else
-				$OSMOSIS_POLY_OPTONS=""
+				echo "->Precise cropping disabled!"
+				OSMOSIS_POLY_OPTONS=""
 			fi
 			
  			$OSMOSIS_BIN $DEBUG_OSMOSIS --read-pbf-fast file="$OSM_WGET_TMP_FILE" \
@@ -559,16 +561,16 @@ if [ ! -d $GMAPOUT_DIR ]; then
 fi
 echo "-->Basemap @"`date`
 
-if [ $OSM_SRC_FILE_PBF -nt $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_base.img ]; then
+#if [ $OSM_SRC_FILE_PBF -nt $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_base.img ]; then
 	$GMT_BIN -jo $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_base.img \
 		$BASEMAP_DIR/gmapsupp.img \
 		$ADDR_DIR/gmapsupp.img \
 		$FIXME_DIR/gmapsupp.img \
 		$MAXSPEED_DIR/gmapsupp.img \
 		$BOUNDARY_DIR/gmapsupp.img
-else
-	echo "Already there!"
-fi 
+#else
+#	echo "Already there!"
+#fi 
 
 echo "-->PKW @"`date`
 if [ $OSM_SRC_FILE_PBF -nt $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_pkw.img ]; then
