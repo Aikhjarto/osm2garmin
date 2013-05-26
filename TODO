@@ -14,6 +14,9 @@ Improvements
 
 * mkgmap can read with the argument -c from a config file. Using this would allow to loop over all available configs instead of having several similar sections for each (basemap, bikemap, pkwmap) map in make.sh
 
+* treat warnings of "rm" when purging already existing temporary folders
+
+* provide more style and TYP files
 
 Stability
 =========
