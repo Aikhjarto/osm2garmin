@@ -105,6 +105,7 @@ DEBUG_MKMAP="--verbose --list-styles"
 # temporary folders for separate maps
 BASEMAP_DIR="$TEMP_DIR/gbasemap"
 PKW_DIR="$TEMP_DIR/gpkw"
+BIKE_DIR="$TEMP_DIR/gbike"
 ADDR_DIR="$TEMP_DIR/gaddr"
 FIXME_DIR="$TEMP_DIR/gfixme"
 BOUNDARY_DIR="$TEMP_DIR/gboundary"
@@ -387,6 +388,38 @@ if [ $OSM_SRC_FILE_PBF -nt $BASEMAP_DIR/gmapsupp.img ]; then
 else
 	echo "Already there!"
 fi
+
+### bikemap
+echo "-------------------->bikemap @"`date`
+if [ $OSM_SRC_FILE_PBF -nt $BIKE_DIR/gmapsupp.img ]; then
+	if [ ! -d $BIKE_DIR ]; then
+		mkdir -p $BIKE_DIR
+		if [ $? -ne 0 ]; then
+			echo "ERROR creating $BIKE_DIR"
+			exit
+		fi
+	else
+		rm $BIKE_DIR/*
+	fi
+	echo "Bike map"
+	$JAVA_BIN $XmxRAM -jar $MKGMAP_JAR $DEBUG_MKMAP --max-jobs --style-file=$AIOSTYLES_DIR/bikemap_style/ --description='Openstreetmap_Bike' \
+		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=4 --product-id=45 \
+		--series-name="OSM-AllInOne-$ISO-bike" --family-name=OSM_BIKE --area-name=EU --latin1 \
+		--mapname="$MAP_GRP"0001 --draw-priority=10 --add-pois-to-areas \
+		--link-pois-to-ways --net --route --drive-on-right \
+		$MKGMAP_OPTION_BOUNDS \
+		$AIOSTYLES_DIR/bikemap_typ.txt\
+		--gmapsupp \
+		--output-dir=$BIKE_DIR \
+		$MKGMAP_FILE_IMPORT
+
+	echo `du -hs $BIKE_DIR` " " `du -hs $BIKE_DIR/gmapsupp.img`
+	if [ "$KEEP_TMP_FILE" != "" ]; then	
+		rm $BIKE_DIR/$MAP_GRP*.img # clean up, since mkgmap does not
+	fi
+else
+	echo "Already there!"
+fi
 	
 ### PKW
 echo "-------------------->gpkw @"`date`
@@ -418,6 +451,8 @@ if [ $OSM_SRC_FILE_PBF -nt $PKW_DIR/gmapsupp.img ]; then
 else
 	echo "Already there!"
 fi
+
+
 
 ### Addresses (Overlay map with pretty good visible address tags)
 echo "-------------------->gaddr @"`date`
@@ -554,23 +589,38 @@ if [ "$KEEP_TMP_FILE" != "" ]; then
 	rm $SPLITTER_DIR;
 fi
 
+
+
 ### Merge individual maps to a single *.img file
 echo "-------------------->merge @"`date`
 if [ ! -d $GMAPOUT_DIR ]; then
   mkdir -p $GMAPOUT_DIR
 fi
-echo "-->Basemap @"`date`
 
-#if [ $OSM_SRC_FILE_PBF -nt $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_base.img ]; then
+echo "-->Basemap @"`date`
+if [ $OSM_SRC_FILE_PBF -nt $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_base.img ]; then
 	$GMT_BIN -jo $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_base.img \
 		$BASEMAP_DIR/gmapsupp.img \
 		$ADDR_DIR/gmapsupp.img \
 		$FIXME_DIR/gmapsupp.img \
 		$MAXSPEED_DIR/gmapsupp.img \
 		$BOUNDARY_DIR/gmapsupp.img
-#else
-#	echo "Already there!"
-#fi 
+else
+	echo "Already there!"
+fi 
+
+echo "-->Bike @"`date`
+if [ $OSM_SRC_FILE_PBF -nt $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_bike.img ]; then
+	$GMT_BIN -jo $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_bike.img \
+		$BIKE_DIR/gmapsupp.img \
+		$ADDR_DIR/gmapsupp.img \
+		$FIXME_DIR/gmapsupp.img \
+		$MAXSPEED_DIR/gmapsupp.img \
+		$BOUNDARY_DIR/gmapsupp.img
+else
+	echo "Already there!"
+fi
+
 
 echo "-->PKW @"`date`
 if [ $OSM_SRC_FILE_PBF -nt $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_pkw.img ]; then
@@ -591,6 +641,7 @@ if [ "$KEEP_TMP_FILES" != "" ]; then
 	rm $SPLITTER_DIR
 	rm $BOUNDS_DIR
 	rm $BASEMAP_DIR
+	rm $BIKE_DIR
 	rm $PKW_DIR
 	rm $ADDR_DIR
 	rm $FIXME_DIR
