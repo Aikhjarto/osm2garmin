@@ -55,11 +55,11 @@ SPLITTER_MAX_NODES=1000000 # maximum number of nodes per file (splitter will spl
 # osmosis (used for cropping data) http://wiki.openstreetmap.org/wiki/Osmosis
 SPLITTER_JAR="$APPS_DIR/splitter/splitter-r302/splitter.jar"
 MKGMAP_JAR="$APPS_DIR/mkgmap/mkgmap-r2572/mkgmap.jar"
-OSMFILTER_BIN="nice -n $NICE_VAL $APPS_DIR/osmfilter/osmfilter-1.2S/osmfilter"
-OSMCONVERT_BIN="nice -n $NICE_VAL $APPS_DIR/osmconvert/osmconvert-0.7P/osmconvert"
-GMT_BIN="nice -n $NICE_VAL $APPS_DIR/lgmt/lgmt08067/gmt"
-JAVA_BIN="nice -n $NICE_VAL java"
-OSMOSIS_BIN="nice -n $NICE_VAL $APPS_DIR/osmosis/osmosis-0.43.1/bin/osmosis"
+OSMFILTER_BIN="$APPS_DIR/osmfilter/osmfilter-1.2S/osmfilter"
+OSMCONVERT_BIN="$APPS_DIR/osmconvert/osmconvert-0.7P/osmconvert"
+GMT_BIN="$APPS_DIR/lgmt/lgmt08067/gmt"
+JAVA_BIN="/usr/bin/java"
+OSMOSIS_BIN="$APPS_DIR/osmosis/osmosis-0.43.1/bin/osmosis"
 
 # output folder (use "." for current folder)
 GMAPOUT_DIR="."
@@ -145,6 +145,50 @@ MKGMAP_FILE_IMPORT="$SPLITTER_DIR/*.pbf"
 
 ############################ the work starts here ###################
 
+### sanity checks
+# check for executables and java files
+if [ ! -x $JAVA_BIN ]; then
+	echo "ERROR: JAVA binary is no executable file"
+	exit
+fi
+if [ ! -f $SPLITTER_JAR ]; then
+	echo "ERROR: $SPLITTER_JAR is missing"
+	exit
+fi
+if [ ! -f $MKGMAP_JAR ]; then
+	echo "ERROR: $MKGMAP_JAR is missing"
+	exit
+fi
+if [ ! -x $OSMFILTER_BIN ]; then
+	echo "ERROR: $OSMFILTER_START is no executable file"
+	exit
+fi
+if [ ! -x $OSMCONVERT_BIN ]; then
+	echo "ERROR: $OSMCONVERT_START is no executable file"
+	exit
+fi
+if [ ! -x $GMT_START ]; then
+	echo "ERROR: $GMT_START is no executable file"
+	exit
+fi
+if [ ! -x $OSMOSIS_BIN ]; then
+	echo "ERROR: $OSMOSIS_START is no executable file"
+	exit
+fi
+
+# set nice values
+OSMFILTER_START="nice -n $NICE_VAL $OSMFILTER_BIN"
+OSMCONVERT_START="nice -n $NICE_VAL $OSMCONVERT_BIN"
+GMT_START="nice -n $NICE_VAL $GMT_BIN"
+JAVA_START="nice -n $NICE_VAL $JAVA_BIN"
+OSMOSIS_START="nice -n $NICE_VAL $OSMOSIS_BIN"
+
+# check for auxiliary files
+if [ ! -d $AIOSTYLES_DIR ]; then
+	echo "style directory $AIOSTYLES_DIR not found";
+	exit
+fi
+
 ### Download maps if not already present (just convert is pbf is present)
 
 echo "----------------->Preprocess map"
@@ -182,7 +226,7 @@ if [ ! -s $OSM_SRC_FILE_O5M ] || [ ! -s $OSM_SRC_FILE_PBF ]; then
 #			echo "download PBF and convert to o5m in parallel"
 #			wget -O - $DOWNLOAD_URL  | \
 #				tee $OSM_SRC_FILE_PBF | \
-#				$OSMCONVERT_BIN - $DEBUG_OSMCONVERT -t=$OSMCONVERT_WORKDIR -o=$OSM_SRC_FILE_O5M
+#				$OSMCONVERT_START - $DEBUG_OSMCONVERT -t=$OSMCONVERT_WORKDIR -o=$OSM_SRC_FILE_O5M
 #			OSM_WGET_TMP_FILE=$TEMP_DIR/osmcopy/wget_tmp.osm.pbf
 			OSM_WGET_TMP_FILE=$OSM_SRC_FILE_PBF;
 			if [ ! -f $OSM_WGET_TMP_FILE ]; then
@@ -197,8 +241,8 @@ if [ ! -s $OSM_SRC_FILE_O5M ] || [ ! -s $OSM_SRC_FILE_PBF ]; then
 			echo "------>download PBF and convert with a cropping polygon"
 			# complete-ways cannot be used then reading from incomplete file, so file is downloaded first. Then the polygon is applied and in parallel the file is converted to o5m
 			#wget -O - $DOWNLOAD_URL  | \
-			#	tee >($OSMCONVERT_BIN - $DEBUG_OSMCONVERT $OSMCONVERT_CUT_OPTIONS -o=$OSM_SRC_FILE_PBF) | \
-			#	$OSMCONVERT_BIN - $DEBUG_OSMCONVERT $OSM_CONVERT_CUT_OPTIONS -o=$OSM_SRC_FILE_O5M		
+			#	tee >($OSMCONVERT_START - $DEBUG_OSMCONVERT $OSMCONVERT_CUT_OPTIONS -o=$OSM_SRC_FILE_PBF) | \
+			#	$OSMCONVERT_START - $DEBUG_OSMCONVERT $OSM_CONVERT_CUT_OPTIONS -o=$OSM_SRC_FILE_O5M		
 			OSM_WGET_TMP_FILE=$TEMP_DIR/osmcopy/wget_tmp.osm.pbf
 
 			if [ ! -f $OSM_WGET_TMP_FILE ]; then
@@ -209,9 +253,9 @@ if [ ! -s $OSM_SRC_FILE_O5M ] || [ ! -s $OSM_SRC_FILE_PBF ]; then
 				fi
 			fi
 			# processing polygon on pdf and converting in parallel with two osmconvert instances is not reliable in current version (keeps crashing).
-#			$OSMCONVERT_BIN $OSM_WGET_TMP_FILE $DEBUG_OSMCONVERT $OSMCONVERT_CUT_OPTIONS --out-pbf | \
+#			$OSMCONVERT_START $OSM_WGET_TMP_FILE $DEBUG_OSMCONVERT $OSMCONVERT_CUT_OPTIONS --out-pbf | \
 # 				tee $OSM_SRC_FILE_PBF | \ 
-#				$OSMCONVERT_BIN - $DEBUG_OSMCONVERT -o=$OSM_SRC_FILE_O5M
+#				$OSMCONVERT_START - $DEBUG_OSMCONVERT -o=$OSM_SRC_FILE_O5M
 
 			echo "--->appling cropping polygon to downloaded file @"`date`
 			# either osmosis or osmconvert can be used to crop the map along a polygon. Osmconvert is faster than osmosis. However, osmconvert is not stable right now with whole continents.
@@ -233,11 +277,11 @@ if [ ! -s $OSM_SRC_FILE_O5M ] || [ ! -s $OSM_SRC_FILE_PBF ]; then
 				OSMOSIS_POLY_OPTONS=""
 			fi
 			
- 			$OSMOSIS_BIN $DEBUG_OSMOSIS --read-pbf-fast file="$OSM_WGET_TMP_FILE" \
+ 			$OSMOSIS_START $DEBUG_OSMOSIS --read-pbf-fast file="$OSM_WGET_TMP_FILE" \
  				--bounding-polygon file="$POLY_DIR/$POLY.poly" $OSMOSIS_POLY_OPTIONS \
  				--write-pbf file="$OSM_SRC_FILE_PBF"
 #			OSMCONVERT_CUT_OPTIONS="-B=$POLY_DIR/$POLY.poly --complete-ways --complex-ways"
-#			$OSMCONVERT_BIN $OSM_WGET_TMP_FILE $DEBUG_OSMCONVERT $OSMCONVERT_CUT_OPTIONS -t=$OSMCONVERT_WORKDIR/tmp -o=$OSM_SRC_FILE_PBF
+#			$OSMCONVERT_START $OSM_WGET_TMP_FILE $DEBUG_OSMCONVERT $OSMCONVERT_CUT_OPTIONS -t=$OSMCONVERT_WORKDIR/tmp -o=$OSM_SRC_FILE_PBF
 			#TODO: replace osmosis with https://github.com/MaZderMind/osm-history-splitter which should be faster
 			
 			# abort if error (can crash frequently on low powered machines and huge input maps (e.g. a whole continent)
@@ -276,7 +320,7 @@ if [ ! -z $ENABLE_BOUNDS ]; then
 		# caution o5m format needs about twice the harddisk-space of the pbf format
 		if [ $OSM_SRC_FILE_PBF -nt $OSM_SRC_FILE_O5M ] || [ ! -s $OSM_SRC_FILE_O5M ]; then
 			echo "---------->convert to o5m @"`date`
-			$OSMCONVERT_BIN $DEBUG_OSMCONVERT -t=$OSMCONVERT_WORKDIR/tmp $OSM_SRC_FILE_PBF --out-o5m -o=$OSM_SRC_FILE_O5M
+			$OSMCONVERT_START $DEBUG_OSMCONVERT -t=$OSMCONVERT_WORKDIR/tmp $OSM_SRC_FILE_PBF --out-o5m -o=$OSM_SRC_FILE_O5M
 			if [ $? -ne 0 ]; then 
 				echo "ERROR while converting pbf input to o5m for boundaries failed! "`date`
 				exit
@@ -289,7 +333,7 @@ if [ ! -z $ENABLE_BOUNDS ]; then
 		echo "---------------------> extracting bounds info from map @"`date`
 		if [ $OSM_SRC_FILE_O5M -nt $BOUNDS_FILE.o5m ]; then
 			# extract boundary information from source 
-			$OSMFILTER_BIN $OSM_SRC_FILE_O5M $DEBUG_OSMFILTER -t=$TEMP_DIR/osmfilter_temp --keep-nodes= \
+			$OSMFILTER_START $OSM_SRC_FILE_O5M $DEBUG_OSMFILTER -t=$TEMP_DIR/osmfilter_temp --keep-nodes= \
 				--keep-ways-relations="boundary=administrative =postal_code postal_code=" \
 				-o=$BOUNDS_FILE.o5m
 			if [ $? -ne 0 ]; then
@@ -304,9 +348,9 @@ if [ ! -z $ENABLE_BOUNDS ]; then
 		### convert to *.bnd files
 		echo "--------------------->creating bounds folder for mkgmap @"`date`
 		rm $BOUNDS_DIR/* # delete old files
-	#	$JAVA_BIN $XmxRAM -jar $MKGMAP_JAR --max-jobs --verbose \
+	#	$JAVA_START $XmxRAM -jar $MKGMAP_JAR --max-jobs --verbose \
 	#		--bounds=$BOUNDS_DIR --createboundsfile=$BOUNDS_FILE.pbf
-		$JAVA_BIN $XmxRAM -cp $MKGMAP_JAR uk.me.parabola.mkgmap.reader.osm.boundary.BoundaryPreprocessor \
+		$JAVA_START $XmxRAM -cp $MKGMAP_JAR uk.me.parabola.mkgmap.reader.osm.boundary.BoundaryPreprocessor \
 			$BOUNDS_FILE.o5m \
 			$BOUNDS_DIR	
 		if [ $? -ne 0 ]; then
@@ -347,7 +391,7 @@ if [ ! $SPLITTER_STAT_FILE -nt $OSM_SRC_FILE_PBF ]; then
 		# purging old files
 		rm $SPLITTER/*
 	fi
-	$JAVA_BIN $XmxRAM -jar $SPLITTER_JAR \
+	$JAVA_START $XmxRAM -jar $SPLITTER_JAR \
 		--mapid="$MAP_GRP"0345 --max-nodes=$SPLITTER_MAX_NODES --keep-complete=true \
 		--output-dir=$SPLITTER_DIR --write-kml=areas.kml $OSM_SRC_FILE_PBF
 	echo `du -hs $SPLITTER_DIR`
@@ -370,7 +414,7 @@ if [ $OSM_SRC_FILE_PBF -nt $BASEMAP_DIR/gmapsupp.img ]; then
 		rm $BASEMAP_DIR/*
 	fi
 	echo "Basemap"
-	$JAVA_BIN $XmxRAM -jar $MKGMAP_JAR --max-jobs $DEBUG_MKMAP --style-file=$AIOSTYLES_DIR/basemap_style/ --description='Openstreetmap' \
+	$JAVA_START $XmxRAM -jar $MKGMAP_JAR --max-jobs $DEBUG_MKMAP --style-file=$AIOSTYLES_DIR/basemap_style/ --description='Openstreetmap' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=4 --product-id=45 \
 		--series-name="OSM-AllInOne-$ISO-bmap" --family-name=OSM --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"0001 --draw-priority=10 --add-pois-to-areas \
@@ -402,7 +446,7 @@ if [ $OSM_SRC_FILE_PBF -nt $BIKE_DIR/gmapsupp.img ]; then
 		rm $BIKE_DIR/*
 	fi
 	echo "Bike map"
-	$JAVA_BIN $XmxRAM -jar $MKGMAP_JAR $DEBUG_MKMAP --max-jobs --style-file=$AIOSTYLES_DIR/bikemap_style/ --description='Openstreetmap_Bike' \
+	$JAVA_START $XmxRAM -jar $MKGMAP_JAR $DEBUG_MKMAP --max-jobs --style-file=$AIOSTYLES_DIR/bikemap_style/ --description='Openstreetmap_Bike' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=4 --product-id=45 \
 		--series-name="OSM-AllInOne-$ISO-bike" --family-name=OSM_BIKE --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"0001 --draw-priority=10 --add-pois-to-areas \
@@ -434,7 +478,7 @@ if [ $OSM_SRC_FILE_PBF -nt $PKW_DIR/gmapsupp.img ]; then
 		rm $PKW_DIR/*
 	fi
 	echo "PKW map"
-	$JAVA_BIN $XmxRAM -jar $MKGMAP_JAR $DEBUG_MKMAP --max-jobs --style-file=$AIOSTYLES_DIR/pkw_style/ --description='Openstreetmap_PKW' \
+	$JAVA_START $XmxRAM -jar $MKGMAP_JAR $DEBUG_MKMAP --max-jobs --style-file=$AIOSTYLES_DIR/pkw_style/ --description='Openstreetmap_PKW' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=4 --product-id=45 \
 		--series-name="OSM-AllInOne-$ISO-pkw" --family-name=OSM_PKW --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"0001 --draw-priority=10 --add-pois-to-areas \
@@ -467,7 +511,7 @@ if [ $OSM_SRC_FILE_PBF -nt $ADDR_DIR/gmapsupp.img ]; then
 		rm $ADDR_DIR/*	
 	fi
 	echo "Adresses"
-	$JAVA_BIN $XmxRAM -jar $MKGMAP_JAR $DEBUG_MKMAP --max-jobs --style-file=$AIOSTYLES_DIR/addr_style/ --description='Adressen' \
+	$JAVA_START $XmxRAM -jar $MKGMAP_JAR $DEBUG_MKMAP --max-jobs --style-file=$AIOSTYLES_DIR/addr_style/ --description='Adressen' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=5 --product-id=40 \
 		--series-name="OSM-AllInOne-$ISO-Addr" --family-name=ADRESSEN --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"1001 --draw-priority=20 --add-pois-to-areas --transparent \
@@ -496,7 +540,7 @@ if [ $OSM_SRC_FILE_PBF -nt $FIXME_DIR/gmapsupp.img ]; then
 		rm $FIXME_DIR/*
 	fi
 	echo "Fixme"
-	$JAVA_BIN $XmxRAM -jar $MKGMAP_JAR $DEBUG_MKMAP --max-jobs --style-file=$AIOSTYLES_DIR/fixme_style/ --description='Fixme_Layer' \
+	$JAVA_START $XmxRAM -jar $MKGMAP_JAR $DEBUG_MKMAP --max-jobs --style-file=$AIOSTYLES_DIR/fixme_style/ --description='Fixme_Layer' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=3 --product-id=33 \
 		--series-name="OSM-AllInOne-$ISO-Fixme" --family-name=FIXME --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"2001 --draw-priority=22 --transparent \
@@ -525,7 +569,7 @@ if [ $OSM_SRC_FILE_PBF -nt $BOUNDARY_DIR/gmapsupp.img ]; then
 		rm $BOUNDARY_DIR/*
 	fi
 	echo "Boundary"
-	$JAVA_BIN $XmxRAM -jar $MKGMAP_JAR $DEBUG_MKMAP --max-jobs --style-file=$AIOSTYLES_DIR/boundary_style/ --description='Boundary_Layer' \
+	$JAVA_START $XmxRAM -jar $MKGMAP_JAR $DEBUG_MKMAP --max-jobs --style-file=$AIOSTYLES_DIR/boundary_style/ --description='Boundary_Layer' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=6 --product-id=30 \
 		--series-name="OSM-AllInOne-$ISO-boundary" --family-name=boundary --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"3001 --draw-priority=21 --transparent \
@@ -554,7 +598,7 @@ if [ $OSM_SRC_FILE_PBF -nt $MAXSPEED_DIR/gmapsupp.img ]; then
 		rm $MAXSPEED_DIR/*
 	fi
 	echo "Maxspeed"
-	$JAVA_BIN $XmxRAM -jar $MKGMAP_JAR $DEBUG_MKMAP --max-jobs --style-file=$AIOSTYLES_DIR/maxspeed_style/ --description='Maxspeed' \
+	$JAVA_START $XmxRAM -jar $MKGMAP_JAR $DEBUG_MKMAP --max-jobs --style-file=$AIOSTYLES_DIR/maxspeed_style/ --description='Maxspeed' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=84 --product-id=15 \
 		--series-name="OSM-AllInOne-$ISO-Maxspeed" --family-name=MAXSPEED --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"4001 --draw-priority=19 --transparent \
@@ -576,7 +620,7 @@ fi
 #  mkdir -p $BUGS_DIR
 #fi
 #echo "OSM-Bugs"
-#$JAVA_BIN $XmxRAM -jar $MKGMAP_JAR $DEBUG_MKMAP --max-jobs --style-file=$AIOSTYLES_DIR/osb_style/ --description='Openstreetbugs' \
+#$JAVA_START $XmxRAM -jar $MKGMAP_JAR $DEBUG_MKMAP --max-jobs --style-file=$AIOSTYLES_DIR/osb_style/ --description='Openstreetbugs' \
 #	--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=3 --product-id=33 \
 #	--series-name="OSM-AllInOne-$ISO-OSB" --family-name=OSB --area-name=EU --latin1 \
 #	--mapname="$MAP_GRP"3345 --draw-priority=23 --no-poi-address --transparent \
@@ -599,7 +643,7 @@ fi
 
 echo "-->Basemap @"`date`
 if [ $OSM_SRC_FILE_PBF -nt $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_base.img ]; then
-	$GMT_BIN -jo $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_base.img \
+	$GMT_START -jo $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_base.img \
 		$BASEMAP_DIR/gmapsupp.img \
 		$ADDR_DIR/gmapsupp.img \
 		$FIXME_DIR/gmapsupp.img \
@@ -611,7 +655,7 @@ fi
 
 echo "-->Bike @"`date`
 if [ $OSM_SRC_FILE_PBF -nt $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_bike.img ]; then
-	$GMT_BIN -jo $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_bike.img \
+	$GMT_START -jo $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_bike.img \
 		$BIKE_DIR/gmapsupp.img \
 		$ADDR_DIR/gmapsupp.img \
 		$FIXME_DIR/gmapsupp.img \
@@ -624,7 +668,7 @@ fi
 
 echo "-->PKW @"`date`
 if [ $OSM_SRC_FILE_PBF -nt $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_pkw.img ]; then
-	$GMT_BIN -jo $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_pkw.img \
+	$GMT_START -jo $GMAPOUT_DIR/gmapsupp_"$COUNTRY_NAME"_pkw.img \
 		$PKW_DIR/gmapsupp.img \
 		$ADDR_DIR/gmapsupp.img \
 		$FIXME_DIR/gmapsupp.img \
