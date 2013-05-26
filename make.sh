@@ -69,21 +69,21 @@ GMAPOUT_DIR="."
 # Which map should be build?
 
 # Austria
-GEOFABRIK_CONTINENT_NAME="europe"
-GEOFABRIK_MAP_NAME="austria"
-COUNTRY_NAME="Austria"
-COUNTRY_ABBR="AT"
-MAP_GRP="8324" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
-ISO="AT" # iso abbreviation of country
-POLY="UpperAustria"
+#GEOFABRIK_CONTINENT_NAME="europe"
+#GEOFABRIK_MAP_NAME="austria"
+#COUNTRY_NAME="Austria"
+#COUNTRY_ABBR="AT"
+#MAP_GRP="8324" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
+#ISO="AT" # iso abbreviation of country
+#POLY="UpperAustria"
 
 # Cut out a piece of Europe
-#GEOFABRIK_MAP_NAME="europe-latest"
-#COUNTRY_NAME="AustriaVicinity"
-#COUNTRY_ABBR="EU"
-#MAP_GRP="6800"
-#ISO="EU"
-#POLY="Austria_Vicinity"
+GEOFABRIK_MAP_NAME="europe-latest"
+COUNTRY_NAME="AustriaVicinity"
+COUNTRY_ABBR="EU"
+MAP_GRP="6800"
+ISO="EU"
+POLY="Austria_Vicinity"
 
 # Germany
 #GEOFABRIK_CONTINENT_NAME="europe"
@@ -131,8 +131,9 @@ ENABLE_BOUNDS="y" # needed for address search capabilty
 
 # command to import split files in mkgmap
 # Caution: with -c option in an un-preprocessed template.args file a lot of command line settings can be overwritten
-MKGMAP_FILE_IMPORT="-c $SPLITTER_DIR/template.args"
-#MKGMAP_FILE_IMPORT="$SPLITTER_DIR/*.pbf"
+# e.g. map-id will be overwritten. So gmt cannot combine the maps.
+#MKGMAP_FILE_IMPORT="-c $SPLITTER_DIR/template.args"
+MKGMAP_FILE_IMPORT="$SPLITTER_DIR/*.pbf"
 
 ##Hints for mkgmap:
 # somewhat between mkgmap 2338 and 2386 the option --no-poi-address became invalid

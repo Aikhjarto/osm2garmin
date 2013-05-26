@@ -21,6 +21,8 @@ Improvements
 Stability
 =========
 
-* check if all filenames are quoted (therefore, if spaces in path are allowed)
+* check if all filenames are quoted (therefore, if spaces in path are allowed). There is a problem with the -c options of mkgmap and filename quotes. See make.sh for comments
 
 * several problems if script is continued after it was aborted with CTRL-C (return values are not evaluated). This problem can be treated with state files
+
+* check what happens if one part of [ $1 -nt $2 ] is empty or missing
