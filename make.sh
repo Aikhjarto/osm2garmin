@@ -431,7 +431,12 @@ if [ $OSM_SRC_FILE_PBF -nt $BASEMAP_DIR/gmapsupp.img ]; then
 		--gmapsupp $TYP_DIR/basemap.TYP \
 		--output-dir=$BASEMAP_DIR/ \
 		$MKGMAP_FILE_IMPORT
-		
+	
+	if [ ! -s $BASEMAP_DIR/gmapsupp.img ]; then
+		echo "ERROR: basemap could not be created"
+		exit
+	fi
+	
 	echo `du -hs $BASEMAP_DIR` " " `du -hs $BASEMAP_DIR/gmapsupp.img`
 	if [ "$KEEP_TMP_FILE" != "" ]; then
 		rm $BASEMAP_DIR/$MAP_GRP*.img # clean up, since mkgmap does not
@@ -464,6 +469,11 @@ if [ $OSM_SRC_FILE_PBF -nt $BIKE_DIR/gmapsupp.img ]; then
 		--output-dir=$BIKE_DIR \
 		$MKGMAP_FILE_IMPORT
 
+	if [ ! -s $BIKE_DIR/gmapsupp.img ]; then
+		echo "ERROR: bike could not be created"
+		exit
+	fi
+	
 	echo `du -hs $BIKE_DIR` " " `du -hs $BIKE_DIR/gmapsupp.img`
 	if [ "$KEEP_TMP_FILE" != "" ]; then	
 		rm $BIKE_DIR/$MAP_GRP*.img # clean up, since mkgmap does not
@@ -472,7 +482,7 @@ else
 	echo "Already there!"
 fi
 	
-### PKW
+### PKW map
 echo "-------------------->gpkw @"`date`
 if [ $OSM_SRC_FILE_PBF -nt $PKW_DIR/gmapsupp.img ]; then
 	if [ ! -d $PKW_DIR ]; then
@@ -494,6 +504,11 @@ if [ $OSM_SRC_FILE_PBF -nt $PKW_DIR/gmapsupp.img ]; then
 		--gmapsupp $TYP_DIR/pkw.TYP \
 		--output-dir=$PKW_DIR \
 		$MKGMAP_FILE_IMPORT
+	
+	if [ ! -s $PKW_DIR/gmapsupp.img ]; then
+		echo "ERROR: pkw map could not be created"
+		exit
+	fi
 
 	echo `du -hs $PKW_DIR` " " `du -hs $PKW_DIR/gmapsupp.img`
 	if [ "$KEEP_TMP_FILE" != "" ]; then	
@@ -502,8 +517,6 @@ if [ $OSM_SRC_FILE_PBF -nt $PKW_DIR/gmapsupp.img ]; then
 else
 	echo "Already there!"
 fi
-
-
 
 ### Addresses (Overlay map with pretty good visible address tags)
 echo "-------------------->gaddr @"`date`
@@ -526,6 +539,11 @@ if [ $OSM_SRC_FILE_PBF -nt $ADDR_DIR/gmapsupp.img ]; then
 		--output-dir=$ADDR_DIR \
 		$MKGMAP_FILE_IMPORT
 		
+	if [ ! -s $ADDR_DIR/gmapsupp.img ]; then
+		echo "ERROR: address map could not be created"
+		exit
+	fi
+	
 	echo `du -hs $ADDR_DIR` " " `du -hs $ADDR_DIR/gmapsupp.img`
 	if [ "$KEEP_TMP_FILE" != "" ]; then
 		rm $ADDR_DIR/$MAP_GRP*.img # clean up, since mkgmap does not
@@ -554,6 +572,11 @@ if [ $OSM_SRC_FILE_PBF -nt $FIXME_DIR/gmapsupp.img ]; then
 		--gmapsupp $TYP_DIR/fixme.TYP \
 		--output-dir=$FIXME_DIR \
 		$MKGMAP_FILE_IMPORT
+	
+	if [ ! -s $FIXME_DIR/gmapsupp.img ]; then
+		echo "ERROR: fixme map could not be created"
+		exit
+	fi
 		
 	echo `du -hs $FIXME_DIR` " " `du -hs $FIXME_DIR/gmapsupp.img`
 	if [ "$KEEP_TMP_FILE" != "" ]; then
@@ -584,6 +607,11 @@ if [ $OSM_SRC_FILE_PBF -nt $BOUNDARY_DIR/gmapsupp.img ]; then
 		--output-dir=$BOUNDARY_DIR \
 		$MKGMAP_FILE_IMPORT
 	
+	if [ ! -s $BOUNDARY_DIR/gmapsupp.img ]; then
+		echo "ERROR: boundary map could not be created"
+		exit
+	fi
+	
 	echo `du -hs $BOUNDARY_DIR` " " `du -hs $BOUNDARY_DIR/gmapsupp.img`
 	if [ "$KEEP_TMP_FILE" != "" ]; then
 		rm $BOUNDARY_DIR/$MAP_GRP*.img # clean up, since mkgmap does not
@@ -612,6 +640,12 @@ if false && [ $OSM_SRC_FILE_PBF -nt $MAXSPEED_DIR/gmapsupp.img ]; then
 		--gmapsupp $TYP_DIR/maxspeed.TYP \
 		--output-dir=$MAXSPEED_DIR \
 		$MKGMAP_FILE_IMPORT
+	
+	if [ ! -s $MAXSPEED_DIR/gmapsupp.img ]; then
+		echo "ERROR: maxspeed map could not be created"
+		exit
+	fi
+	
 	echo `du -hs $MAXSPEED_DIR` " " `du -hs $MAXSPEED_DIR/gmapsupp.img`
 	if [ "$KEEP_TMP_FILE" != "" ]; then
 		rm $MAXSPEED_DIR/$MAP_GRP*.img # clean up, since mkgmap does not
@@ -685,6 +719,11 @@ if [ ! -z $OSBSQL_BIN ]; then
 			--output-dir=$BUGS_DIR \
 			$BUGS_DIR/*.pbf
 
+		if [ ! -s $BUGS_DIR/gmapsupp.img ]; then
+			echo "ERROR: OSB map could not be created"
+			exit
+		fi
+	
 		echo `du -hs $BUGS_DIR` " " `du -hs $BUGS_DIR/gmapsupp.img`
 		if [ $? -ne 0 ]; then
 			exit
@@ -713,7 +752,7 @@ if [ ! -d $GMAPOUT_DIR ]; then
 fi
 
 if [ ! -z $OSBSQL_BIN ]; then
-#	OSB_MERGE="$BUGS_DIR/gmapsupp.img"
+	OSB_MERGE="$BUGS_DIR/gmapsupp.img"
 else
 	OSB_MERGE=""
 fi
