@@ -98,9 +98,10 @@ POLY="UpperAustria"
 
 # debug flags (set to empty string "" for disabling debug output)
 DEBUG_MKMAP="--verbose --list-styles"
-#DEBUG_OSMCONVERT="--verbose --statistics"
-#DEBUG_OSMFILTER="--verbose"
-#DEBUG_OSMOSIS="-v"
+DEBUG_OSMCONVERT="--verbose --statistics"
+DEBUG_OSMFILTER="--verbose"
+DEBUG_OSMOSIS="-v"
+DEBUG_GMT="-v"
 
 ## parition the temporary directory
 # temporary folders for separate maps
@@ -758,7 +759,7 @@ else
 fi
 echo "-->Basemap @"`date`
 if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_base.img ]; then
-	$GMT_START -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_base.img \
+	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_base.img \
 		"$BASEMAP_DIR"/gmapsupp.img \
 		"$ADDR_DIR"/gmapsupp.img \
 		"$FIXME_DIR"/gmapsupp.img "$OSB_MERGE" \
@@ -769,12 +770,12 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_base.img ];
 		exit
 	fi
 else
-	echo "Already there!"
+	echo "gmapsupp_"$COUNTRY_NAME"_base.img is already there!"
 fi 
 
 echo "-->Bike @"`date`
 if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_bike.img ]; then
-	$GMT_START -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_bike.img \
+	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_bike.img \
 		"$BIKE_DIR"/gmapsupp.img \
 		"$ADDR_DIR"/gmapsupp.img \
 		"$FIXME_DIR"/gmapsupp.img "$OSB_MERGE" \
@@ -785,13 +786,13 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_bike.img ];
 		exit
 	fi
 else
-	echo "Already there!"
+	echo "gmapsupp_"$COUNTRY_NAME"_bike.img is already there!"
 fi
 
 
 echo "-->PKW @"`date`
 if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_pkw.img ]; then
-	$GMT_START -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_pkw.img \
+	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_pkw.img \
 		"$PKW_DIR"/gmapsupp.img \
 		"$ADDR_DIR"/gmapsupp.img \
 		"$FIXME_DIR"/gmapsupp.img "$OSB_MERGE" \
@@ -802,7 +803,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_pkw.img ]; 
 		exit
 	fi
 else
-	echo "Already there!"
+	echo "gmapsupp_"$COUNTRY_NAME"_pkw.img is already there!"
 fi
 
 if [ "$KEEP_TMP_FILES" != "" ]; then
