@@ -1,7 +1,9 @@
-() download several files and merge them (e.g. Austria, Czech and Germany) or
+* download several files and merge them (e.g. Austria, Czech and Germany)
 
-() Add Bugs. Since gary68 quitted his service, and Openstreetbugs don't provied a usefull export, no bugs are shown in the map.
+* Add Bugs from openstreetbugs (http://openstreetbugs.schokokeks.org/dumps/osbdump_latest.sql.bz2)
 
-() add a switch that enables/disables complete-ways (for much faster but more inaccure cropping)
+* fetch topographic contour lines and integrate it in the final map
 
-() have a try on OSM-history-splitter (should be able to crop data faster than osmosis)
+* have a try on OSM-history-splitter (should be able to crop data faster than osmosis)
+
+* mkgmap can read with the argument -c from a config file. Using this would allow to loop over all available configs instead of having several similar sections for each (basemap, bikemap, pkwmap) map in make.sh
