@@ -18,6 +18,10 @@ Improvements
 
 * provide more style and TYP files
 
+* check out mkgmaps new (around r2500+) support for overview-maps
+
+* basemap shows some overview housenumbers. Move them completely to address layer.
+
 Stability
 =========
 
