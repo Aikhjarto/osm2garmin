@@ -53,8 +53,8 @@ SPLITTER_MAX_NODES=1000000 # maximum number of nodes per file (splitter will spl
 # osmfilter (used for boundary calculation; needed for address searches) from http://wiki.openstreetmap.org/wiki/Osmfilter
 # osmconvert (converter between nearly all important OSM data formats) from http://wiki.openstreetmap.org/wiki/Osmconvert
 # osmosis (used for cropping data) http://wiki.openstreetmap.org/wiki/Osmosis
-SPLITTER_JAR="$APPS_DIR/splitter/splitter-r302/splitter.jar"
-MKGMAP_JAR="$APPS_DIR/mkgmap/mkgmap-r2572/mkgmap.jar"
+SPLITTER_JAR="$APPS_DIR/splitter/splitter-r304/splitter.jar"
+MKGMAP_JAR="$APPS_DIR/mkgmap/mkgmap-r2620/mkgmap.jar"
 OSMFILTER_BIN="$APPS_DIR/osmfilter/osmfilter-1.2S/osmfilter"
 OSMCONVERT_BIN="$APPS_DIR/osmconvert/osmconvert-0.7P/osmconvert"
 GMT_BIN="$APPS_DIR/lgmt/lgmt08067/gmt"
@@ -425,9 +425,12 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BASEMAP_DIR"/gmapsupp.img ]; then
 	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" --max-jobs $DEBUG_MKMAP --style-file="$AIOSTYLES_DIR"/basemap_style/ --description='Openstreetmap' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=4 --product-id=45 \
 		--series-name="OSM-AllInOne-$ISO-bmap" --family-name=OSM --area-name=EU --latin1 \
-		--mapname="$MAP_GRP"0001 --draw-priority=10 --add-pois-to-areas \
-		--make-all-cycleways \
-		--link-pois-to-ways --net --route --drive-on-right \
+		--mapname="$MAP_GRP"0001 --draw-priority=10 \
+		--add-pois-to-areas --poi-address \
+		--make-all-cycleways --check-roundabouts \
+		--link-pois-to-ways --route --drive-on-right \
+		--process-destination --process-exits \
+		--location-autofill=is_in,nearest \
 		$MKGMAP_OPTION_BOUNDS \
 		--gmapsupp "$TYP_DIR"/basemap.TYP \
 		--output-dir="$BASEMAP_DIR"/ \
@@ -462,8 +465,11 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BIKE_DIR"/gmapsupp.img ]; then
 	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" $DEBUG_MKMAP --max-jobs --style-file="$AIOSTYLES_DIR"/bikemap_style/ --description='Openstreetmap_Bike' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=4 --product-id=45 \
 		--series-name="OSM-AllInOne-$ISO-bike" --family-name=OSM_BIKE --area-name=EU --latin1 \
-		--mapname="$MAP_GRP"0001 --draw-priority=10 --add-pois-to-areas \
-		--link-pois-to-ways --net --route --drive-on-right \
+		--mapname="$MAP_GRP"0001 --draw-priority=10 \
+		--add-pois-to-areas --poi-address \
+		--make-all-cycleways --check-roundabouts \
+		--link-pois-to-ways --route --drive-on-right \
+		--ignore-maxspeeds \
 		$MKGMAP_OPTION_BOUNDS \
 		"$AIOSTYLES_DIR"/bikemap_typ.txt\
 		--gmapsupp \
@@ -499,8 +505,12 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$PKW_DIR"/gmapsupp.img ]; then
 	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" $DEBUG_MKMAP --max-jobs --style-file="$AIOSTYLES_DIR"/pkw_style/ --description='Openstreetmap_PKW' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=4 --product-id=45 \
 		--series-name="OSM-AllInOne-$ISO-pkw" --family-name=OSM_PKW --area-name=EU --latin1 \
-		--mapname="$MAP_GRP"0001 --draw-priority=10 --add-pois-to-areas \
-		--link-pois-to-ways --net --route --drive-on-right \
+		--mapname="$MAP_GRP"0001 --draw-priority=10 \
+		--add-pois-to-areas --poi-address \
+		--check-roundabouts \
+		--link-pois-to-ways --route --drive-on-right \
+		--process-destination --process-exits \
+		--location-autofill=is_in,nearest \
 		$MKGMAP_OPTION_BOUNDS \
 		--gmapsupp "$TYP_DIR"/pkw.TYP \
 		--output-dir="$PKW_DIR" \
