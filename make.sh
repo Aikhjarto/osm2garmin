@@ -54,9 +54,9 @@ SPLITTER_MAX_NODES=1000000 # maximum number of nodes per file (splitter will spl
 # osmconvert (converter between nearly all important OSM data formats) from http://wiki.openstreetmap.org/wiki/Osmconvert
 # osmosis (used for cropping data) http://wiki.openstreetmap.org/wiki/Osmosis
 SPLITTER_JAR="$APPS_DIR/splitter/splitter-r304/splitter.jar"
-MKGMAP_JAR="$APPS_DIR/mkgmap/mkgmap-r2620/mkgmap.jar"
+MKGMAP_JAR="$APPS_DIR/mkgmap/mkgmap-r2634/mkgmap.jar"
 OSMFILTER_BIN="$APPS_DIR/osmfilter/osmfilter-1.2S/osmfilter"
-OSMCONVERT_BIN="$APPS_DIR/osmconvert/osmconvert-0.7P/osmconvert"
+OSMCONVERT_BIN="$APPS_DIR/osmconvert/osmconvert-0.7Q/osmconvert"
 GMT_BIN="$APPS_DIR/lgmt/lgmt08067/gmt"
 JAVA_BIN="/usr/bin/java"
 OSMOSIS_BIN="$APPS_DIR/osmosis/osmosis-0.43.1/bin/osmosis"
@@ -723,7 +723,7 @@ if [ ! -z $OSBSQL_BIN ]; then
 		--output-dir=$BUGS_DIR --write-kml=areas.kml $ALLBUGS_PBF
 		
 		$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" $DEBUG_MKMAP --max-jobs --style-file="$AIOSTYLES_DIR"/osb_style/ --description='Openstreetbugs' \
-			--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=3 --product-id=33 \
+			--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=3 --product-id=34 \
 			--series-name="OSM-AllInOne-$ISO-OSB" --family-name=OSB --area-name=EU --latin1 \
 			--mapname="$MAP_GRP"5001 --draw-priority=23 --no-poi-address --transparent \
 			--gmapsupp "$TYP_DIR"/osb.TYP \
