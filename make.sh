@@ -53,6 +53,7 @@ SPLITTER_MAX_NODES=1000000 # maximum number of nodes per file (splitter will spl
 # osmfilter (used for boundary calculation; needed for address searches) from http://wiki.openstreetmap.org/wiki/Osmfilter
 # osmconvert (converter between nearly all important OSM data formats) from http://wiki.openstreetmap.org/wiki/Osmconvert
 # osmosis (used for cropping data) http://wiki.openstreetmap.org/wiki/Osmosis
+# osbsql2osm (used for converting openstreetbugs)  http://tuxcode.org/john/osbsql2osm/osbsql2osm-latest.tar.gz 
 SPLITTER_JAR="$APPS_DIR/splitter/splitter-r304/splitter.jar"
 MKGMAP_JAR="$APPS_DIR/mkgmap/mkgmap-r2634/mkgmap.jar"
 OSMFILTER_BIN="$APPS_DIR/osmfilter/osmfilter-1.2S/osmfilter"
