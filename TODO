@@ -7,14 +7,12 @@ Features
 
 * download several files and merge them (e.g. Austria, Czech and Germany)
 
-* Add Bugs from openstreetbugs (http://openstreetbugs.schokokeks.org/dumps/osbdump_latest.sql.bz2)
-
-* fetch topographic contour lines and integrate it in the final map
+* fetch topographic contour lines and integrate it in the final map (smrt2osm is outdated and phyghtmap both has lots of unresolved dependencies in OpenSuSe 12.3)
 
 Improvements
 ============
 
-* have a try on OSM-history-splitter (should be able to crop data faster than osmosis)
+* have a try on OSM-history-splitter (should be able to crop data faster than osmosis; has a lot of unresolved dependencies on openSuSe 12.3)
 
 * mkgmap can read with the argument -c from a config file. Using this would allow to loop over all available configs instead of having several similar sections for each (basemap, bikemap, pkwmap) map in make.sh
 
