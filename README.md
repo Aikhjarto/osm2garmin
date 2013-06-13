@@ -20,18 +20,18 @@ Nonetheless, I would be happy for feedback, contributions and bug-reports within
 Dependencies
 ============
 
-This script has to type of dependencies. Firstly, it needs auxiliary scripts and programs. Secondly, it needs auxiliary (beside osm) data. Great thanks to the people who developed those.
+This script has two types of dependencies. Firstly, it needs auxiliary scripts and programs. Secondly, it needs auxiliary (beside osm) data. Great thanks to the people who developed those.
 See the parameter section in the beginning of make.sh for examples of how to set the path's to auxiliary files.
 
 
 Auxiliary programs
 ------------------
-This script makes use of well developed applications for processing, filtering and modifying OSM data. 
+This script makes use of well developed applications for processing, filtering, and modifying OSM data. 
 
 * splitter (splits up huge input files in manageable parts) from http://www.mkgmap.org.uk/splitter/
 * gmt (combines sub-maps to a single file) from http://www.gmaptool.eu/
 * mkgmap (converts OSM data to Garmin's file format) from http://www.mkgmap.org.uk/snapshots/
-* osmfilter (used for boundary calculation; needed for address searches) from http://wiki.openstreetmap.org/wiki/Osmfilter
+* osmfilter (used for boundary calculation that are needed for address searches) from http://wiki.openstreetmap.org/wiki/Osmfilter
 * osmconvert (converter between nearly all important OSM data formats) from http://wiki.openstreetmap.org/wiki/Osmconvert
 * osmosis (used for cropping data) http://wiki.openstreetmap.org/wiki/Osmosis
 
@@ -45,9 +45,9 @@ MKGMAP will require style files. These files hold rules how OSM object IDs shoul
 * https://github.com/miramikes/garmin_hiking_map
 * https://github.com/Helius/osm2garmin
 
-If you want to modify the styles yourself, you can find an explanation of the syntac here: http://wiki.openstreetmap.org/wiki/Mkgmap/help/style_rules#Element_type_definition
+If you want to modify the styles yourself, you can find an explanation of the syntax here: http://wiki.openstreetmap.org/wiki/Mkgmap/help/style_rules#Element_type_definition
 
-TYP files define the look (shape, color) how items (streets, buildings, POI, landscape,...) are displayed on your Garmin device.
+TYP files define the way (shape, color) how items (streets, buildings, POI, landscape,...) are displayed on your Garmin device.
 There are serveral sources like
 
 * http://www.avdweb.nl/gps/garmin/improved-garmin-map-view-with-typ-files.html
@@ -55,7 +55,7 @@ There are serveral sources like
 * http://pinns.co.uk/osm/typwiz3.html
 * http://wiki.openstreetmap.org/wiki/User:Computerteddy
 
-There are also several editor for TYP-files our there:
+There are also several editors for TYP-files out there:
 
 * http://ati.land.cz/gps/typedit/editor.cgi
 * http://pinns.co.uk/osm/typwiz3.html
@@ -64,7 +64,7 @@ POLY files define a polygon around a specific section on a map. This can be used
 
 * https://wiki.openstreetmap.org/wiki/Osmosis/Polygon_Filter_File_Format
 
-I recommend an OSM editor like http://josm.openstreetmap.de/ to edit the file.
+I recommend an OSM editor like http://josm.openstreetmap.de/ to edit the poly files.
 
 Usage
 =====
@@ -73,7 +73,7 @@ Usage
 
 2) Issue a ./make.sh
 
-A more sophisticated start command can be "./make.sh | tee osm2garmin.log" from inside a screen.
+A more sophisticated start command can be "./make.sh | tee osm2garmin.log" from inside a screen. This will log simultanously to a file and to stdout.
 
 Note on Hardware Demands
 ========================
