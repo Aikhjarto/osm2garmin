@@ -33,6 +33,8 @@ MKGMAP will require style files. These files hold rules how OSM object IDs shoul
 
 * https://github.com/berndw1960/aiostyles
 * http://wiki.openstreetmap.org/wiki/User:Computerteddy
+* https://github.com/miramikes/garmin_hiking_map
+* https://github.com/Helius/osm2garmin
 
 If you want to modify the styles yourself, you can find an explanation of the syntac here: http://wiki.openstreetmap.org/wiki/Mkgmap/help/style_rules#Element_type_definition
 
