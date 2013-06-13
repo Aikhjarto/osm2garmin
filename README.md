@@ -5,9 +5,16 @@ This project provides a script for converting OpenStreetMap data to Garmin's img
 
 Unlike a lot of other projects that aim to do the same, this script generates routeable maps with functioning address search.
 
-I do not intend to provide a fully functional out-of-the-box experience. It would be a shame that the wide variety of geo-information provided by OpenStreetMap is limited by means of simple filter script. The users of such a script would never get a glimpse of the possibilities they have with the data.
-This project is intended to provide a starting point for your personal OSM to Garmin conversion project.
+Capabilities:
+* download of OpenStreetmap data
+* cropping to only interessting parts
+* support for several map styles for different needs, e.g. hiking, bicycling, motorcycling
+* functioning routing
+* address search on device
+* multilayer maps (you can turn on/off individual layers if your device supports this)
 
+I do not intend to provide a fully functional out-of-the-box experience. It would be a shame that the wide variety of geo-information provided by OpenStreetMap is limited by means of simple filter script. The users of such a script would never get a glimpse of the possibilities they have with the data.
+This project is intended to provide a starting point for your personal OSM to Garmin conversion project. 
 Nonetheless, I would be happy for feedback, contributions and bug-reports within the project site https://github.com/Aikhjarto/osm2garmin
 
 Dependencies
