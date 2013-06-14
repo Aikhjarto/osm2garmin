@@ -7,7 +7,7 @@ Features
 
 * download several files and merge them (e.g. Austria, Czech and Germany)
 
-* fetch topographic contour lines and integrate it in the final map (smrt2osm is outdated and phyghtmap both has lots of unresolved dependencies in OpenSuSe 12.3)
+* fetch topographic contour lines and integrate it in the final map (srmt2osm is outdated any cannot crop along polygon; phyghtmap has lots of unresolved dependencies in OpenSuSe 12.3)
 
 Improvements
 ============
