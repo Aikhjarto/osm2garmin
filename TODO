@@ -11,6 +11,9 @@ Features
 
 Improvements
 ============
+* support input parameters rather than configuring by commenting codelines
+
+* have a separate tmp folder for each map set
 
 * have a try on OSM-history-splitter (should be able to crop data faster than osmosis; has a lot of unresolved dependencies on openSuSe 12.3)
 
