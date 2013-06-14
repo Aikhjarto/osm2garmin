@@ -50,8 +50,8 @@ MKGMAP will require style files. These files hold rules how OSM object IDs shoul
 
 If you want to modify the styles yourself, you can find an explanation of the syntax here: http://wiki.openstreetmap.org/wiki/Mkgmap/help/style_rules#Element_type_definition
 
-TYP files define the way (shape, color) how items (streets, buildings, POI, landscape,...) are displayed on your Garmin device.
-There are serveral sources like
+TYP files define the way (shape, color) how items (streets, buildings, POI, landscape,...) are displayed on your Garmin device. Typically they come with style files.
+However, there are serveral other sources like
 
 * http://www.avdweb.nl/gps/garmin/improved-garmin-map-view-with-typ-files.html
 * http://www.cferrero.net/maps/guide_to_TYPs.html
