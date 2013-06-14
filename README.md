@@ -56,7 +56,7 @@ However, there are serveral other sources like
 * http://www.avdweb.nl/gps/garmin/improved-garmin-map-view-with-typ-files.html
 * http://www.cferrero.net/maps/guide_to_TYPs.html
 * http://pinns.co.uk/osm/typwiz3.html
-* http://wiki.openstreetmap.org/wiki/User:Computerteddy
+* http://freizeitkarte-osm.de/de/design.html
 
 There are also several editors for TYP-files out there:
 
