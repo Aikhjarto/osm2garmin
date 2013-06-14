@@ -40,10 +40,13 @@ Auxiliary data
 --------------
 MKGMAP will require style files. These files hold rules how OSM object IDs should be translated to Garmin object IDs. Possible sources include:
 
-* https://github.com/berndw1960/aiostyles
-* http://wiki.openstreetmap.org/wiki/User:Computerteddy
-* https://github.com/miramikes/garmin_hiking_map
-* https://github.com/Helius/osm2garmin
+* General purpose maps: https://github.com/berndw1960/aiostyles
+* General purpose maps: http://wiki.openstreetmap.org/wiki/User:Computerteddy
+* Hiking map: https://github.com/miramikes/garmin_hiking_map
+* Mountainbike map: https://github.com/Helius/osm2garmin
+* Outdoor Map: https://github.com/patricks/osm-garmin/tree/master/osm-map-outdoor
+* Mapnik like style: https://github.com/stac47/osm-garmin/tree/master/styles/mapnik
+* Malmis stlye: https://github.com/Malmis/osmgarmin
 
 If you want to modify the styles yourself, you can find an explanation of the syntax here: http://wiki.openstreetmap.org/wiki/Mkgmap/help/style_rules#Element_type_definition
 
