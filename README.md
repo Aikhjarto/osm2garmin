@@ -62,6 +62,7 @@ There are also several editors for TYP-files out there:
 
 * http://ati.land.cz/gps/typedit/editor.cgi
 * http://pinns.co.uk/osm/typwiz3.html
+* http://maptk.dnsalias.com/
 
 POLY files define a polygon around a specific section on a map. This can be used to crop e.g. the map of Europe to contain only the Alps. As the the whole world (even not whole continents) probably won't fit on your Garmin device you'll want to crop the maps. The structure of *.poly files is explained in 
 
