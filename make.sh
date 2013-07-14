@@ -54,10 +54,10 @@ SPLITTER_MAX_NODES=1000000 # maximum number of nodes per file (splitter will spl
 # osmconvert (converter between nearly all important OSM data formats) from http://wiki.openstreetmap.org/wiki/Osmconvert
 # osmosis (used for cropping data) http://wiki.openstreetmap.org/wiki/Osmosis
 # osbsql2osm (used for converting openstreetbugs)  http://tuxcode.org/john/osbsql2osm/osbsql2osm-latest.tar.gz 
-SPLITTER_JAR="$APPS_DIR/splitter/splitter-r304/splitter.jar"
-MKGMAP_JAR="$APPS_DIR/mkgmap/mkgmap-r2634/mkgmap.jar"
+SPLITTER_JAR="$APPS_DIR/splitter/splitter-r306/splitter.jar"
+MKGMAP_JAR="$APPS_DIR/mkgmap/mkgmap-r2656/mkgmap.jar"
 OSMFILTER_BIN="$APPS_DIR/osmfilter/osmfilter-1.2S/osmfilter"
-OSMCONVERT_BIN="$APPS_DIR/osmconvert/osmconvert-0.7Q/osmconvert"
+OSMCONVERT_BIN="$APPS_DIR/osmconvert/osmconvert-0.7T/osmconvert"
 GMT_BIN="$APPS_DIR/lgmt/lgmt08067/gmt"
 JAVA_BIN="/usr/bin/java"
 OSMOSIS_BIN="$APPS_DIR/osmosis/osmosis-0.43.1/bin/osmosis"
@@ -70,21 +70,21 @@ GMAPOUT_DIR="."
 # Which map should be build?
 
 # Austria
-#GEOFABRIK_CONTINENT_NAME="europe"
-#GEOFABRIK_MAP_NAME="austria"
-#COUNTRY_NAME="Austria"
-#COUNTRY_ABBR="AT"
-#MAP_GRP="8324" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
-#ISO="AT" # iso abbreviation of country
+GEOFABRIK_CONTINENT_NAME="europe"
+GEOFABRIK_MAP_NAME="austria"
+COUNTRY_NAME="Austria"
+COUNTRY_ABBR="AT"
+MAP_GRP="8324" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
+ISO="AT" # iso abbreviation of country
 #POLY="UpperAustria"
 
 # Cut out a piece of Europe
-GEOFABRIK_MAP_NAME="europe-latest"
-COUNTRY_NAME="AustriaVicinity"
-COUNTRY_ABBR="EU"
-MAP_GRP="6800"
-ISO="EU"
-POLY="Austria_Vicinity"
+#GEOFABRIK_MAP_NAME="europe-latest"
+#COUNTRY_NAME="AustriaVicinity"
+#COUNTRY_ABBR="EU"
+#MAP_GRP="6800"
+#ISO="EU"
+#POLY="Austria_Vicinity"
 
 # Germany
 #GEOFABRIK_CONTINENT_NAME="europe"
