@@ -42,6 +42,9 @@ POLY_DIR=$HOME"/osm/poly"
 #TEMP_DIR="$HOME/noBackup/osmtemp"
 TEMP_DIR=/pub/tmp/osmtemp
 XmxRAM="-Xmx2048M" # max ram available to java for splitter and mkgmap
+if [ ! -d "$TEMP_DIR/osmosis" ]; then
+	mkdir -p "$TEMP_DIR/osmosis";
+fi
 export JAVACMD_OPTIONS="-Xmx3G -server -Djava.io.tmpdir=$TEMP_DIR/osmosis" # java options for osmosis
 NICE_VAL="9" # values higher than 0 will reduce processor priority
 SPLITTER_MAX_NODES=1000000 # maximum number of nodes per file (splitter will split the whole map in according to this number)
