@@ -772,53 +772,105 @@ if [ ! -z $OSBSQL_BIN ]; then
 else
 	OSB_MERGE=""
 fi
-echo "-->Basemap @"`date`
-if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_base.img ]; then
-	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_base.img \
+
+
+MAP_POSTFIX="base"
+echo "-->Basemap @"`date`" postfix: "$MAP_POSTFIX
+if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
+	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
+		"$BASEMAP_DIR"/gmapsupp.img \
+		"$ADDR_DIR"/gmapsupp.img \
+		"$MAXSPEED_DIR"/gmapsupp.img \
+		"$BOUNDARY_DIR"/gmapsupp.img		
+	if [ $? -ne 0 ]; then
+		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
+		exit
+	fi
+else
+	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+fi 
+
+MAP_POSTFIX="bike"
+echo "-->Bike @"`date`" postfix: "$MAP_POSTFIX
+if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
+	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
+		"$BIKE_DIR"/gmapsupp.img \
+		"$ADDR_DIR"/gmapsupp.img \
+		"$MAXSPEED_DIR"/gmapsupp.img \
+		"$BOUNDARY_DIR"/gmapsupp.img
+	if [ $? -ne 0 ]; then
+		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
+		exit
+	fi
+else
+	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+fi
+
+MAP_POSTFIX="pkw"
+echo "-->PKW @"`date`" postfix: "$MAP_POSTFIX
+if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
+	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
+		"$PKW_DIR"/gmapsupp.img \
+		"$ADDR_DIR"/gmapsupp.img \
+		"$MAXSPEED_DIR"/gmapsupp.img \
+		"$BOUNDARY_DIR"/gmapsupp.img
+	if [ $? -ne 0 ]; then
+		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
+		exit
+	fi
+else
+	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+fi
+
+MAP_POSTFIX="base_with_bugs"
+echo "-->Basemap @"`date`" postfix: "$MAP_POSTFIX
+if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
+	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
 		"$BASEMAP_DIR"/gmapsupp.img \
 		"$ADDR_DIR"/gmapsupp.img \
 		"$FIXME_DIR"/gmapsupp.img "$OSB_MERGE" \
 		"$MAXSPEED_DIR"/gmapsupp.img \
 		"$BOUNDARY_DIR"/gmapsupp.img		
 	if [ $? -ne 0 ]; then
-		echo "ERROR merging basemap!"
+		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
 		exit
 	fi
 else
-	echo "gmapsupp_"$COUNTRY_NAME"_base.img is already there!"
+	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 fi 
 
-echo "-->Bike @"`date`
-if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_bike.img ]; then
-	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_bike.img \
+MAP_POSTFIX="bike_with_bugs"
+echo "-->Bike @"`date`" postfix: "$MAP_POSTFIX
+if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
+	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
 		"$BIKE_DIR"/gmapsupp.img \
 		"$ADDR_DIR"/gmapsupp.img \
 		"$FIXME_DIR"/gmapsupp.img "$OSB_MERGE" \
 		"$MAXSPEED_DIR"/gmapsupp.img \
 		"$BOUNDARY_DIR"/gmapsupp.img
 	if [ $? -ne 0 ]; then
-		echo "ERROR merging bike map!"
+		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
 		exit
 	fi
 else
-	echo "gmapsupp_"$COUNTRY_NAME"_bike.img is already there!"
+	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 fi
 
-
-echo "-->PKW @"`date`
-if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_pkw.img ]; then
-	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_pkw.img \
+MAP_POSTFIX="pkw_with_bugs"
+echo "-->PKW @"`date`" postfix: "$MAP_POSTFIX
+if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
+	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
 		"$PKW_DIR"/gmapsupp.img \
 		"$ADDR_DIR"/gmapsupp.img \
 		"$FIXME_DIR"/gmapsupp.img "$OSB_MERGE" \
 		"$MAXSPEED_DIR"/gmapsupp.img \
 		"$BOUNDARY_DIR"/gmapsupp.img
 	if [ $? -ne 0 ]; then
-		echo "ERROR merging PKW map!"
+		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
 		exit
 	fi
 else
-	echo "gmapsupp_"$COUNTRY_NAME"_pkw.img is already there!"
+	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 fi
 
 if [ "$KEEP_TMP_FILES" != "" ]; then
