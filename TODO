@@ -12,6 +12,7 @@ Features
 Improvements
 ============
 * support input parameters rather than configuring by commenting codelines
+** (at least seperate config from script)
 
 * have a separate tmp folder for each map set
 
@@ -29,6 +30,7 @@ Improvements
 
 Stability and Compatibility
 ===========================
+* use template.args from splitter for input to mkgmap (rather than "*.pbf")
 
 * check if all filenames are quoted (therefore, if spaces in path are allowed). There is a problem with the -c options of mkgmap and filename quotes. See make.sh for comments
 
