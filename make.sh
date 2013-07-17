@@ -64,30 +64,32 @@ OSMCONVERT_BIN="$APPS_DIR/osmconvert/osmconvert-0.7T/osmconvert"
 GMT_BIN="$APPS_DIR/lgmt/lgmt08067/gmt"
 JAVA_BIN="/usr/bin/java"
 OSMOSIS_BIN="$APPS_DIR/osmosis/osmosis-0.43.1/bin/osmosis"
-OSBSQL_BIN="$APPS_DIR/osbsql2osm/osbsql2osm-0.3.1/src/osbsql2osm"
+OSBSQL_BIN="$APPS_DIR/osbsql2osm/osbsql2osm-0.3.1/src/osbsql2osm" # if empty string, OSB will not be processed (but script will create useable maps)
 
 # output folder (use "." for current folder)
 GMAPOUT_DIR="."
 
 ######################### map settings ######################################
 # Which map should be build?
+# HINT: You should state a polygon even if you don't want to reduce the data in the input file. The polygon will also be used to crop openstreetbugs data!
 
 # Austria
-GEOFABRIK_CONTINENT_NAME="europe"
-GEOFABRIK_MAP_NAME="austria"
-COUNTRY_NAME="Austria"
-COUNTRY_ABBR="AT"
-MAP_GRP="8324" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
-ISO="AT" # iso abbreviation of country
-#POLY="UpperAustria"
+#GEOFABRIK_CONTINENT_NAME="europe"
+#GEOFABRIK_MAP_NAME="austria"
+#COUNTRY_NAME="Austria"
+#COUNTRY_ABBR="AT"
+#MAP_GRP="8324" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
+#ISO="AT" # iso abbreviation of country
+#POLY="UpperAustria" # part of austria
+#POLY="Austria_Vicinity" # poly just to reduce data from openstreetbugs
 
 # Cut out a piece of Europe
-#GEOFABRIK_MAP_NAME="europe-latest"
-#COUNTRY_NAME="AustriaVicinity"
-#COUNTRY_ABBR="EU"
-#MAP_GRP="6800"
-#ISO="EU"
-#POLY="Austria_Vicinity"
+GEOFABRIK_MAP_NAME="europe-latest"
+COUNTRY_NAME="AustriaVicinity"
+COUNTRY_ABBR="EU"
+MAP_GRP="6800"
+ISO="EU"
+POLY="Austria_Vicinity"
 
 # Germany
 #GEOFABRIK_CONTINENT_NAME="europe"
@@ -688,7 +690,7 @@ if [ ! -z $OSBSQL_BIN ]; then
 		ALLBUGS_PBF="$OSM_SRC_DIR/osb.pbf"
 		ALLBUGS_STATE_FILE="$OSM_SRC_DIR/osb.state"
 
-		echo "----> Download OSB"
+		echo "----> Download OSB @"`date`
 		if [ ! "$ALLBUGS_STATE_FILE" -nt "$OSM_SRC_FILE_PBF" ]; then
 			wget -O - http://openstreetbugs.schokokeks.org/dumps/osbdump_latest.sql.bz2 | nice -n $NICE_VAL bunzip2 | $OSBSQL_START > "$ALLBUGS_OSM"
 			if [ $? -ne 0 ]; then
@@ -703,6 +705,7 @@ if [ ! -z $OSBSQL_BIN ]; then
 		fi
 
 		if [ "$POLY" == "" ]; then
+			echo "converting OSB without poly @"`date`
 			$OSMOSIS_START $DEBUG_OSMOSIS --read-xml file="$ALLBUGS_OSM" \
 				--sort \
 				--write-pbf file="$ALLBUGS_PBF"
@@ -712,6 +715,7 @@ if [ ! -z $OSBSQL_BIN ]; then
 			fi
 		else
 			# HINT: can't use osmconvert to crop polygon since OSB data is not sorted (osmconvert need sorted data)
+			echo "converting OSB with poly @"`date`
 			$OSMOSIS_START $DEBUG_OSMOSIS --read-xml file="$ALLBUGS_OSM" \
 				--sort \
  				--bounding-polygon file="$POLY_DIR/$POLY.poly" $OSMOSIS_POLY_OPTIONS \
@@ -722,17 +726,20 @@ if [ ! -z $OSBSQL_BIN ]; then
 			fi
 		fi
 		
+		echo "splitting OSB @"`date`
 		$JAVA_START $XmxRAM -jar "$SPLITTER_JAR" \
 		--mapid="$MAP_GRP"5001 --max-nodes=$SPLITTER_MAX_NODES --keep-complete=true \
 		--output-dir=$BUGS_DIR --write-kml=areas.kml $ALLBUGS_PBF
 		
+		echo "generating OSB @"`date`
 		$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" $DEBUG_MKMAP --max-jobs --style-file="$AIOSTYLES_DIR"/osb_style/ --description='Openstreetbugs' \
 			--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=3 --product-id=34 \
 			--series-name="OSM-AllInOne-$ISO-OSB" --family-name=OSB --area-name=EU --latin1 \
 			--mapname="$MAP_GRP"5001 --draw-priority=23 --no-poi-address --transparent \
 			--gmapsupp "$TYP_DIR"/osb.TYP \
 			--output-dir="$BUGS_DIR" \
-			-c "$BUGS_DIR"/template.args
+			$BUGS_DIR/*.pbf
+#			-c "$BUGS_DIR"/template.args
 
 		if [ ! -s "$BUGS_DIR"/gmapsupp.img ]; then
 			echo "ERROR: OSB map could not be created"
@@ -822,55 +829,57 @@ else
 	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 fi
 
-MAP_POSTFIX="base_with_bugs"
-echo "-->Basemap @"`date`" postfix: "$MAP_POSTFIX
-if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
-	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
-		"$BASEMAP_DIR"/gmapsupp.img \
-		"$ADDR_DIR"/gmapsupp.img \
-		"$FIXME_DIR"/gmapsupp.img "$OSB_MERGE" \
-		"$MAXSPEED_DIR"/gmapsupp.img \
-		"$BOUNDARY_DIR"/gmapsupp.img		
-	if [ $? -ne 0 ]; then
-		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
-		exit
-	fi
-else
-	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
-fi 
+if [ ! -z $OSBSQL_BIN ]; then
+	MAP_POSTFIX="base_with_bugs"
+	echo "-->Basemap @"`date`" postfix: "$MAP_POSTFIX
+	if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
+		$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
+			"$BASEMAP_DIR"/gmapsupp.img \
+			"$ADDR_DIR"/gmapsupp.img \
+			"$FIXME_DIR"/gmapsupp.img "$OSB_MERGE" \
+			"$MAXSPEED_DIR"/gmapsupp.img \
+			"$BOUNDARY_DIR"/gmapsupp.img		
+		if [ $? -ne 0 ]; then
+			echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
+			exit
+		fi
+	else
+		echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+	fi 
 
-MAP_POSTFIX="bike_with_bugs"
-echo "-->Bike @"`date`" postfix: "$MAP_POSTFIX
-if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
-	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
-		"$BIKE_DIR"/gmapsupp.img \
-		"$ADDR_DIR"/gmapsupp.img \
-		"$FIXME_DIR"/gmapsupp.img "$OSB_MERGE" \
-		"$MAXSPEED_DIR"/gmapsupp.img \
-		"$BOUNDARY_DIR"/gmapsupp.img
-	if [ $? -ne 0 ]; then
-		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
-		exit
+	MAP_POSTFIX="bike_with_bugs"
+	echo "-->Bike @"`date`" postfix: "$MAP_POSTFIX
+	if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
+		$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
+			"$BIKE_DIR"/gmapsupp.img \
+			"$ADDR_DIR"/gmapsupp.img \
+			"$FIXME_DIR"/gmapsupp.img "$OSB_MERGE" \
+			"$MAXSPEED_DIR"/gmapsupp.img \
+			"$BOUNDARY_DIR"/gmapsupp.img
+		if [ $? -ne 0 ]; then
+			echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
+			exit
+		fi
+	else
+		echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 	fi
-else
-	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
-fi
 
-MAP_POSTFIX="pkw_with_bugs"
-echo "-->PKW @"`date`" postfix: "$MAP_POSTFIX
-if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
-	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
-		"$PKW_DIR"/gmapsupp.img \
-		"$ADDR_DIR"/gmapsupp.img \
-		"$FIXME_DIR"/gmapsupp.img "$OSB_MERGE" \
-		"$MAXSPEED_DIR"/gmapsupp.img \
-		"$BOUNDARY_DIR"/gmapsupp.img
-	if [ $? -ne 0 ]; then
-		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
-		exit
+	MAP_POSTFIX="pkw_with_bugs"
+	echo "-->PKW @"`date`" postfix: "$MAP_POSTFIX
+	if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
+		$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
+			"$PKW_DIR"/gmapsupp.img \
+			"$ADDR_DIR"/gmapsupp.img \
+			"$FIXME_DIR"/gmapsupp.img "$OSB_MERGE" \
+			"$MAXSPEED_DIR"/gmapsupp.img \
+			"$BOUNDARY_DIR"/gmapsupp.img
+		if [ $? -ne 0 ]; then
+			echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
+			exit
+		fi
+	else
+		echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 	fi
-else
-	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 fi
 
 if [ "$KEEP_TMP_FILES" != "" ]; then
