@@ -33,7 +33,7 @@
 #	http://wiki.openstreetmap.org/wiki/User:Computerteddy
 # APPS: see hints in parameters block below
 # TEMP_DIR: any directory that can hold several gigabytes of temporary data
-AIOSTYLES_DIR=$HOME"/osm/aiostyles/aiostyles"
+AIOSTYLES_DIR=$HOME"/osm/aiostyles"
 TYP_DIR=$HOME"/osm/TYP"
 APPS_DIR=$HOME"/osm/apps"
 POLY_DIR=$HOME"/osm/poly"
@@ -74,22 +74,22 @@ GMAPOUT_DIR="."
 # HINT: You should state a polygon even if you don't want to reduce the data in the input file. The polygon will also be used to crop openstreetbugs data!
 
 # Austria
-#GEOFABRIK_CONTINENT_NAME="europe"
-#GEOFABRIK_MAP_NAME="austria"
-#COUNTRY_NAME="Austria"
-#COUNTRY_ABBR="AT"
-#MAP_GRP="8324" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
-#ISO="AT" # iso abbreviation of country
+GEOFABRIK_CONTINENT_NAME="europe"
+GEOFABRIK_MAP_NAME="austria"
+COUNTRY_NAME="Austria"
+COUNTRY_ABBR="AT"
+MAP_GRP="8324" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
+ISO="AT" # iso abbreviation of country
 #POLY="UpperAustria" # part of austria
-#POLY="Austria_Vicinity" # poly just to reduce data from openstreetbugs
+POLY="Austria_Vicinity" # poly just to reduce data from openstreetbugs
 
 # Cut out a piece of Europe
-GEOFABRIK_MAP_NAME="europe-latest"
-COUNTRY_NAME="AustriaVicinity"
-COUNTRY_ABBR="EU"
-MAP_GRP="6800"
-ISO="EU"
-POLY="Austria_Vicinity"
+#GEOFABRIK_MAP_NAME="europe-latest"
+#COUNTRY_NAME="AustriaVicinity"
+#COUNTRY_ABBR="EU"
+#MAP_GRP="6800"
+#ISO="EU"
+#POLY="Austria_Vicinity"
 
 # Germany
 #GEOFABRIK_CONTINENT_NAME="europe"
@@ -438,7 +438,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BASEMAP_DIR"/gmapsupp.img ]; then
 		--process-destination --process-exits \
 		--location-autofill=is_in,nearest \
 		$MKGMAP_OPTION_BOUNDS \
-		--gmapsupp "$TYP_DIR"/basemap.TYP \
+		--gmapsupp "$AIOSTYLES_DIR"/basemap_typ.txt \
 		--output-dir="$BASEMAP_DIR"/ \
 		$MKGMAP_FILE_IMPORT
 	
@@ -780,8 +780,43 @@ else
 	OSB_MERGE=""
 fi
 
-
 MAP_POSTFIX="base"
+echo "-->Basemap @"`date`" postfix: "$MAP_POSTFIX
+if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
+	cp "$BASEMAP_DIR"/gmapsupp.img "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img
+	if [ $? -ne 0 ]; then
+		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
+		exit
+	fi
+else
+	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+fi 
+
+MAP_POSTFIX="bike"
+echo "-->Bike @"`date`" postfix: "$MAP_POSTFIX
+if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
+	cp "$BIKE_DIR"/gmapsupp.img "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img
+	if [ $? -ne 0 ]; then
+		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
+		exit
+	fi
+else
+	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+fi
+
+MAP_POSTFIX="pkw"
+echo "-->PKW @"`date`" postfix: "$MAP_POSTFIX
+if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
+	cp "$PKW_DIR"/gmapsupp.img "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img
+	if [ $? -ne 0 ]; then
+		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
+		exit
+	fi
+else
+	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+fi
+
+MAP_POSTFIX="base_overlays"
 echo "-->Basemap @"`date`" postfix: "$MAP_POSTFIX
 if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
 	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
@@ -797,7 +832,7 @@ else
 	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 fi 
 
-MAP_POSTFIX="bike"
+MAP_POSTFIX="bike_overlays"
 echo "-->Bike @"`date`" postfix: "$MAP_POSTFIX
 if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
 	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
@@ -813,7 +848,7 @@ else
 	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 fi
 
-MAP_POSTFIX="pkw"
+MAP_POSTFIX="pkw_overlays"
 echo "-->PKW @"`date`" postfix: "$MAP_POSTFIX
 if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
 	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
