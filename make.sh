@@ -58,7 +58,7 @@ SPLITTER_MAX_NODES=1000000 # maximum number of nodes per file (splitter will spl
 # osmosis (used for cropping data) http://wiki.openstreetmap.org/wiki/Osmosis
 # osbsql2osm (used for converting openstreetbugs)  http://tuxcode.org/john/osbsql2osm/osbsql2osm-latest.tar.gz 
 SPLITTER_JAR="$APPS_DIR/splitter/splitter-r306/splitter.jar"
-MKGMAP_JAR="$APPS_DIR/mkgmap/mkgmap-r2656/mkgmap.jar"
+MKGMAP_JAR="$APPS_DIR/mkgmap/mkgmap-r2659/mkgmap.jar"
 OSMFILTER_BIN="$APPS_DIR/osmfilter/osmfilter-1.2S/osmfilter"
 OSMCONVERT_BIN="$APPS_DIR/osmconvert/osmconvert-0.7T/osmconvert"
 GMT_BIN="$APPS_DIR/lgmt/lgmt08067/gmt"
@@ -77,11 +77,11 @@ GMAPOUT_DIR="."
 GEOFABRIK_CONTINENT_NAME="europe"
 GEOFABRIK_MAP_NAME="austria"
 COUNTRY_NAME="Austria"
-COUNTRY_ABBR="AT"
+COUNTRY_ABBR="AUT" #three digit country abbreviatin, see resources/LocatorConfig.xml from mkgmap for examples
 MAP_GRP="8324" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
 ISO="AT" # iso abbreviation of country
-#POLY="UpperAustria" # part of austria
-POLY="Austria_Vicinity" # poly just to reduce data from openstreetbugs
+POLY="UpperAustria" # part of austria
+#POLY="Austria_Vicinity" # poly just to reduce data from openstreetbugs
 
 # Cut out a piece of Europe
 #GEOFABRIK_MAP_NAME="europe-latest"
@@ -95,9 +95,10 @@ POLY="Austria_Vicinity" # poly just to reduce data from openstreetbugs
 #GEOFABRIK_CONTINENT_NAME="europe"
 #GEOFABRIK_MAP_NAME="germany"
 #COUNTRY_NAME="Germany"
-#COUNTRY_ABBR="DE"
+#COUNTRY_ABBR="DEU"
 #MAP_GRP="7024" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
 #ISO="DE" # iso abbreviation of country
+
 
 ################ internal settings ##################################
 # If nothing goes wrong, leave the defaults. Of course you can play around at your own risk.
@@ -158,31 +159,31 @@ MKGMAP_FILE_IMPORT="$SPLITTER_DIR/*.pbf"
 # check for executables and java files
 if [ ! -x $JAVA_BIN ]; then
 	echo "ERROR: JAVA binary is no executable file"
-	exit
+	exit 1
 fi
 if [ ! -f $SPLITTER_JAR ]; then
 	echo "ERROR: $SPLITTER_JAR is missing"
-	exit
+	exit 1
 fi
 if [ ! -f $MKGMAP_JAR ]; then
 	echo "ERROR: $MKGMAP_JAR is missing"
-	exit
+	exit 1
 fi
 if [ ! -x $OSMFILTER_BIN ]; then
 	echo "ERROR: $OSMFILTER_BIN is no executable file"
-	exit
+	exit 1
 fi
 if [ ! -x $OSMCONVERT_BIN ]; then
 	echo "ERROR: $OSMCONVERT_BIN is no executable file"
-	exit
+	exit 1
 fi
 if [ ! -x $GMT_START ]; then
 	echo "ERROR: $GMT_BIN is no executable file"
-	exit
+	exit 1
 fi
 if [ ! -x $OSMOSIS_BIN ]; then
 	echo "ERROR: $OSMOSIS_BIN is no executable file"
-	exit
+	exit 1
 fi
 if [ ! -x $OSBSQL_BIN ]; then
 	echo "WARNING: $OSBSQL_BIN not found! Bugs will not be shown on map!"
@@ -201,7 +202,7 @@ OSMOSIS_START="nice -n $NICE_VAL $OSMOSIS_BIN"
 # check for auxiliary files
 if [ ! -d $AIOSTYLES_DIR ]; then
 	echo "style directory $AIOSTYLES_DIR not found";
-	exit
+	exit 1
 fi
 
 ### Download maps if not already present (just convert is pbf is present)
@@ -213,7 +214,7 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 	 	mkdir -p "$OSM_SRC_DIR"
 	 	if [ $? -ne 0 ]; then
 	 		echo "ERROR creating $OSM_SRC_DIR";
-			exit
+			exit 1
 		fi
 	fi
 
@@ -230,7 +231,7 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 			mkdir "$OSMCONVERT_WORKDIR"
 			if [ $? -ne 0 ]; then
 				echo "ERROR creating $OSMCONVERT_WORKDIR"
-				exit
+				exit 1
 			fi
 		else
 			rm "$OSMCONVERT_WORKDIR"/*
@@ -248,7 +249,7 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 				wget -O "$OSM_WGET_TMP_FILE" $DOWNLOAD_URL 
 				if [ $? -ne 0 ]; then
 					echo "ERROR: Download of $DOWNLOAD_URL to $OSM_WGET_TMP_FILE failed"
-					exit
+					exit 1
 				fi
 			fi
 			
@@ -264,7 +265,7 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 				wget -O "$OSM_WGET_TMP_FILE" $DOWNLOAD_URL 
 				if [ $? -ne 0 ]; then
 					echo "ERROR: Download of $DOWNLOAD_URL to $OSM_WGET_TMP_FILE failed"
-					exit
+					exit 1
 				fi
 			fi
 			# processing polygon on pdf and converting in parallel with two osmconvert instances is not reliable in current version (keeps crashing).
@@ -278,7 +279,7 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 				mkdir "$TEMP_DIR"/osmosis
 				if [ $? -ne 0 ]; then
 					echo "ERROR creating $TEMP_DIR/osmosis"
-					exit
+					exit 1
 				fi
 			else
 				rm "$TEMP_DIR"/osmosis/*
@@ -305,7 +306,7 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 				# remove partially created file (most of the time, just an empty file is created, but this interferes with the -nt tests in this script)
 				echo "Removing $OSM_SRC_FILE_PBF"
 				rm "$OSM_SRC_FILE_PBF"
-				exit
+				exit 1
 			else
 				echo "Finshed cropping @"`date`
 				if [ "$KEEP_TMP_FILE" != "" ]; then
@@ -338,7 +339,7 @@ if [ ! -z $ENABLE_BOUNDS ]; then
 			$OSMCONVERT_START $DEBUG_OSMCONVERT -t="$OSMCONVERT_WORKDIR"/tmp "$OSM_SRC_FILE_PBF" --out-o5m -o="$OSM_SRC_FILE_O5M"
 			if [ $? -ne 0 ]; then 
 				echo "ERROR while converting pbf input to o5m for boundaries failed! "`date`
-				exit
+				exit 1
 			else
 				echo `du -hs $OSM_SRC_FILE_O5M`
 			fi 
@@ -353,7 +354,7 @@ if [ ! -z $ENABLE_BOUNDS ]; then
 				-o="$BOUNDS_FILE.o5m"
 			if [ $? -ne 0 ]; then
 				echo "ERROR while filtering boundaries @"`date`
-				exit
+				exit 1
 			else
 				echo `du -hs "$BOUNDS_FILE.o5m"`
 				
@@ -370,7 +371,7 @@ if [ ! -z $ENABLE_BOUNDS ]; then
 			"$BOUNDS_DIR"
 		if [ $? -ne 0 ]; then
 			echo "ERROR while generating boundary file @"`date`
-			exit
+			exit 1
 		else
 			echo `du -hs "$BOUNDS_DIR"`
 		fi
@@ -399,7 +400,7 @@ if [ ! "$SPLITTER_STAT_FILE" -nt "$OSM_SRC_FILE_PBF" ]; then
 		mkdir -p "$SPLITTER_DIR"
 		if [ $? -ne 0 ]; then
 	  		echo "ERROR creating $SPLITTER"
-		  	exit
+		  	exit 1
 		fi
 	else
 		# purging old files
@@ -422,7 +423,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BASEMAP_DIR"/gmapsupp.img ]; then
 		mkdir -p "$BASEMAP_DIR"
 		if [ $? -ne 0 ]; then
 	  		echo "ERROR creating $BASEMAP_DIR"
-	  		exit
+	  		exit 1
 		fi
 	else
 		rm "$BASEMAP_DIR"/*
@@ -444,7 +445,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BASEMAP_DIR"/gmapsupp.img ]; then
 	
 	if [ ! -s "$BASEMAP_DIR"/gmapsupp.img ]; then
 		echo "ERROR: basemap could not be created"
-		exit
+		exit 1
 	fi
 	
 	echo `du -hs "$BASEMAP_DIR"` " " `du -hs "$BASEMAP_DIR"/gmapsupp.img`
@@ -462,7 +463,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BIKE_DIR"/gmapsupp.img ]; then
 		mkdir -p "$BIKE_DIR"
 		if [ $? -ne 0 ]; then
 			echo "ERROR creating $BIKE_DIR"
-			exit
+			exit 1
 		fi
 	else
 		rm "$BIKE_DIR"/*
@@ -484,7 +485,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BIKE_DIR"/gmapsupp.img ]; then
 
 	if [ ! -s $BIKE_DIR/gmapsupp.img ]; then
 		echo "ERROR: bike could not be created"
-		exit
+		exit 1
 	fi
 	
 	echo `du -hs "$BIKE_DIR"` " " `du -hs "$BIKE_DIR"/gmapsupp.img`
@@ -502,7 +503,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$PKW_DIR"/gmapsupp.img ]; then
 		mkdir -p "$PKW_DIR"
 		if [ $? -ne 0 ]; then
 			echo "ERROR creating $PKW_DIR"
-			exit
+			exit 1
 		fi
 	else
 		rm "$PKW_DIR"/*
@@ -524,7 +525,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$PKW_DIR"/gmapsupp.img ]; then
 	
 	if [ ! -s "$PKW_DIR"/gmapsupp.img ]; then
 		echo "ERROR: pkw map could not be created"
-		exit
+		exit 1
 	fi
 
 	echo `du -hs "$PKW_DIR"` " " `du -hs "$PKW_DIR"/gmapsupp.img`
@@ -542,7 +543,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$ADDR_DIR"/gmapsupp.img ]; then
 		mkdir -p "$ADDR_DIR"
 		if [ $? -ne 0 ]; then
 			echo "ERROR creating $ADDR_DIR"
-			exit
+			exit 1
 		fi
 	else
 		rm "$ADDR_DIR"/*
@@ -558,7 +559,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$ADDR_DIR"/gmapsupp.img ]; then
 		
 	if [ ! -s "$ADDR_DIR"/gmapsupp.img ]; then
 		echo "ERROR: address map could not be created"
-		exit
+		exit 1
 	fi
 	
 	echo `du -hs "$ADDR_DIR"` " " `du -hs "$ADDR_DIR"/gmapsupp.img`
@@ -576,7 +577,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$FIXME_DIR"/gmapsupp.img ]; then
 		mkdir -p "$FIXME_DIR"
 		if [ $? -ne 0 ]; then
 			echo "ERROR creating $FIXME_DIR"
-			exit
+			exit 1
 		fi
 	else
 		rm "$FIXME_DIR"/*
@@ -592,7 +593,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$FIXME_DIR"/gmapsupp.img ]; then
 	
 	if [ ! -s "$FIXME_DIR"/gmapsupp.img ]; then
 		echo "ERROR: fixme map could not be created"
-		exit
+		exit 1
 	fi
 		
 	echo `du -hs "$FIXME_DIR"` " " `du -hs "$FIXME_DIR"/gmapsupp.img`
@@ -610,7 +611,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BOUNDARY_DIR"/gmapsupp.img ]; then
 		mkdir -p "$BOUNDARY_DIR"
 		if [ $? -ne 0 ]; then
 			echo "ERROR creating $BOUNDARY_DIR"
-			exit
+			exit 1
 		fi
 	else
 		rm "$BOUNDARY_DIR"/*
@@ -626,7 +627,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BOUNDARY_DIR"/gmapsupp.img ]; then
 	
 	if [ ! -s "$BOUNDARY_DIR"/gmapsupp.img ]; then
 		echo "ERROR: boundary map could not be created"
-		exit
+		exit 1
 	fi
 	
 	echo `du -hs "$BOUNDARY_DIR"` " " `du -hs "$BOUNDARY_DIR"/gmapsupp.img`
@@ -644,7 +645,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$MAXSPEED_DIR"/gmapsupp.img ]; then
 		mkdir -p "$MAXSPEED_DIR"
 		if [ $? -ne 0 ]; then
 			echo "ERROR creating $MAXSPEED_DIR"
-			exit
+			exit 1
 		fi
 	else
 		rm "$MAXSPEED_DIR"/*
@@ -660,7 +661,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$MAXSPEED_DIR"/gmapsupp.img ]; then
 	
 	if [ ! -s "$MAXSPEED_DIR"/gmapsupp.img ]; then
 		echo "ERROR: maxspeed map could not be created"
-		exit
+		exit 1
 	fi
 	
 	echo `du -hs "$MAXSPEED_DIR"` " " `du -hs "$MAXSPEED_DIR"/gmapsupp.img`
@@ -680,7 +681,7 @@ if [ ! -z $OSBSQL_BIN ]; then
 			mkdir -p "$BUGS_DIR"
 			if [ $? -ne 0 ]; then
 				echo "ERROR creating $BUGS_DIR"
-				exit
+				exit 1
 			fi
 		else
 			rm "$BUGS_DIR"/*
@@ -695,7 +696,7 @@ if [ ! -z $OSBSQL_BIN ]; then
 			wget -O - http://openstreetbugs.schokokeks.org/dumps/osbdump_latest.sql.bz2 | nice -n $NICE_VAL bunzip2 | $OSBSQL_START > "$ALLBUGS_OSM"
 			if [ $? -ne 0 ]; then
 				echo "ERROR downloading OSB data!"
-				exit
+				exit 1
 			else
 				# write state file (to detect whether or not download was interrupted with STRG-C (not detectable via return value)
 				echo "successfull downloaded @"`date` >> "$ALLBUGS_STATE_FILE"
@@ -711,7 +712,7 @@ if [ ! -z $OSBSQL_BIN ]; then
 				--write-pbf file="$ALLBUGS_PBF"
 			if [ $? -ne 0 ]; then
 				echo "ERROR converting OSB file!"
-				exit
+				exit 1
 			fi
 		else
 			# HINT: can't use osmconvert to crop polygon since OSB data is not sorted (osmconvert need sorted data)
@@ -722,7 +723,7 @@ if [ ! -z $OSBSQL_BIN ]; then
  				--write-pbf file="$ALLBUGS_PBF"
  			if [ $? -ne 0 ]; then
 				echo "ERROR applying polygon to OSB file!"
-				exit
+				exit 1
 			fi
 		fi
 		
@@ -743,13 +744,13 @@ if [ ! -z $OSBSQL_BIN ]; then
 
 		if [ ! -s "$BUGS_DIR"/gmapsupp.img ]; then
 			echo "ERROR: OSB map could not be created"
-			exit
+			exit 1
 		fi
 	
 		echo `du -hs "$BUGS_DIR"` " " `du -hs "$BUGS_DIR"/gmapsupp.img`
 		if [ $? -ne 0 ]; then
 			echo "ERROR OSB map not created!";
-			exit
+			exit 1
 		fi
 		if [ "$KEEP_TMP_FILE" != "" ]; then
 			rm "$BUGS_DIR"/$MAP_GRP*.img # clean up, since mkgmap does not
@@ -786,7 +787,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTF
 	cp "$BASEMAP_DIR"/gmapsupp.img "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img
 	if [ $? -ne 0 ]; then
 		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
-		exit
+		exit 1
 	fi
 else
 	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
@@ -798,7 +799,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTF
 	cp "$BIKE_DIR"/gmapsupp.img "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img
 	if [ $? -ne 0 ]; then
 		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
-		exit
+		exit 1
 	fi
 else
 	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
@@ -810,7 +811,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTF
 	cp "$PKW_DIR"/gmapsupp.img "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img
 	if [ $? -ne 0 ]; then
 		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
-		exit
+		exit 1
 	fi
 else
 	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
@@ -826,7 +827,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTF
 		"$BOUNDARY_DIR"/gmapsupp.img		
 	if [ $? -ne 0 ]; then
 		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
-		exit
+		exit 1
 	fi
 else
 	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
@@ -842,7 +843,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTF
 		"$BOUNDARY_DIR"/gmapsupp.img
 	if [ $? -ne 0 ]; then
 		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
-		exit
+		exit 1
 	fi
 else
 	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
@@ -858,7 +859,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTF
 		"$BOUNDARY_DIR"/gmapsupp.img
 	if [ $? -ne 0 ]; then
 		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
-		exit
+		exit 1
 	fi
 else
 	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
@@ -876,7 +877,7 @@ if [ ! -z $OSBSQL_BIN ]; then
 			"$BOUNDARY_DIR"/gmapsupp.img		
 		if [ $? -ne 0 ]; then
 			echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
-			exit
+			exit 1
 		fi
 	else
 		echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
@@ -893,7 +894,7 @@ if [ ! -z $OSBSQL_BIN ]; then
 			"$BOUNDARY_DIR"/gmapsupp.img
 		if [ $? -ne 0 ]; then
 			echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
-			exit
+			exit 1
 		fi
 	else
 		echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
@@ -910,7 +911,7 @@ if [ ! -z $OSBSQL_BIN ]; then
 			"$BOUNDARY_DIR"/gmapsupp.img
 		if [ $? -ne 0 ]; then
 			echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
-			exit
+			exit 1
 		fi
 	else
 		echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
