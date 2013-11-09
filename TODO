@@ -2,6 +2,8 @@ Bugs
 ====
 * If a building is tagged with hotel and restaurant, it'll only show up as hotel in the navi's POI search.
 
+* why are housenumbers renderer while they are not set by --housenumber in mkgmap
+
 Features
 ========
 
@@ -11,6 +13,8 @@ Features
 
 Improvements
 ============
+* mkgmap:road-speed, mkgmap:road-speed-max, mkgmap:road-speed-min
+
 * support input parameters rather than configuring by commenting codelines
 ** (at least seperate config from script)
 
