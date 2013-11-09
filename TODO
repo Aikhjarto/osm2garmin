@@ -11,6 +11,8 @@ Features
 
 Improvements
 ============
+* use default mkgmap as style
+
 * mkgmap:road-speed, mkgmap:road-speed-max, mkgmap:road-speed-min
 
 * support input parameters rather than configuring by commenting codelines
