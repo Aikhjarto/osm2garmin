@@ -73,6 +73,7 @@ MKGMAP_FILE_IMPORT="$SPLITTER_DIR/*.pbf"
 # as of r 2464 the documentation comes along with the sourcecode in  /trunk/docs
 # as of Mar 2013 Java 1.7 should be used
 # as of May 10th 2013 r2596 the legacy format for preprocessed bounds is dropped
+# as of 2636: overview maps are available
 # as of 2678: ignore-maxspeeds is removed
 # as of 2690: mkgmap:toll is available
 # as of 2701: Rename all mkgmap:access:* tags to mkgmap:* to make style files a bit shorter
