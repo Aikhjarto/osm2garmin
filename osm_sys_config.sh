@@ -24,7 +24,7 @@ TEMP_DIR=/pub/tmp/osmtemp
 JAVA_RAM="2G" # max RAM memory available to java VM
 
 NICE_VAL="9" # values higher than 0 will reduce processor priority
-SPLITTER_MAX_NODES=1000000 # maximum number of nodes per file (splitter will split the whole map in according to this number)
+SPLITTER_MAX_NODES=20000000 # maximum number of nodes per file (splitter will split the whole map in according to this number)
 
 # jar files and binaries locations
 # splitter (splits up huge input files in manageable parts) from http://www.mkgmap.org.uk/splitter/
