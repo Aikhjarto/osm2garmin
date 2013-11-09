@@ -36,4 +36,5 @@ ISO="AT" # iso abbreviation of country
 #POLY=Germany_Berlin
 
 
-MKGMAP_OPTION_TDBFILE="--tdbfile"
+# specifiy additional output formats like tdb (for viewing on an PC) or nsis for the Nullsoft Scriptable Installer System to later create a Mapsource installer
+MKGMAP_OPTION_TDBFILE="--tdbfile --nsis"
