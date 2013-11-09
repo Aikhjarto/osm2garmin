@@ -362,7 +362,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BASEMAP_DIR"/gmapsupp.img ]; then
 		rm "$BASEMAP_DIR"/*
 	fi
 	echo "Basemap"
-	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" --max-jobs $DEBUG_MKMAP --style-file="$AIOSTYLES_DIR"/basemap_style/ --description='Openstreetmap' \
+	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" --max-jobs --style-file="$AIOSTYLES_DIR"/basemap_style/ --description='Openstreetmap' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=4 --product-id=45 \
 		--series-name="OSM-AllInOne-$ISO-bmap" --family-name=OSM --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"0001 --draw-priority=10 \
@@ -376,7 +376,9 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BASEMAP_DIR"/gmapsupp.img ]; then
 		$MKGMAP_OPTION_TDBFILE \
 		--gmapsupp "$AIOSTYLES_DIR"/basemap_typ.txt \
 		--output-dir="$BASEMAP_DIR"/ \
-		$MKGMAP_FILE_IMPORT
+		$MKGMAP_FILE_IMPORT \
+		$DEBUG_MKGMAP
+		
 	
 	if [ ! -s "$BASEMAP_DIR"/gmapsupp.img ]; then
 		echo "ERROR: basemap could not be created"
@@ -404,7 +406,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BIKE_DIR"/gmapsupp.img ]; then
 		rm "$BIKE_DIR"/*
 	fi
 	echo "Bike map"
-	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" $DEBUG_MKMAP --max-jobs --style-file="$AIOSTYLES_DIR"/bikemap_style/ --description='Openstreetmap_Bike' \
+	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" --max-jobs --style-file="$AIOSTYLES_DIR"/bikemap_style/ --description='Openstreetmap_Bike' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=4 --product-id=45 \
 		--series-name="OSM-AllInOne-$ISO-bike" --family-name=OSM_BIKE --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"0001 --draw-priority=10 \
@@ -419,7 +421,8 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BIKE_DIR"/gmapsupp.img ]; then
 		$MKGMAP_OPTION_TDBFILE \
 		--gmapsupp \
 		--output-dir="$BIKE_DIR" \
-		$MKGMAP_FILE_IMPORT
+		$MKGMAP_FILE_IMPORT \
+		$DEBUG_MKGMAP
 
 	if [ ! -s $BIKE_DIR/gmapsupp.img ]; then
 		echo "ERROR: bike could not be created"
@@ -447,7 +450,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$PKW_DIR"/gmapsupp.img ]; then
 		rm "$PKW_DIR"/*
 	fi
 	echo "PKW map"
-	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" $DEBUG_MKMAP --max-jobs --style-file="$AIOSTYLES_DIR"/pkw_style/ --description='Openstreetmap_PKW' \
+	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" --max-jobs --style-file="$AIOSTYLES_DIR"/pkw_style/ --description='Openstreetmap_PKW' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=4 --product-id=45 \
 		--series-name="OSM-AllInOne-$ISO-pkw" --family-name=OSM_PKW --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"0001 --draw-priority=10 \
@@ -461,7 +464,8 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$PKW_DIR"/gmapsupp.img ]; then
 		$MKGMAP_OPTION_TDBFILE \
 		--gmapsupp "$TYP_DIR"/pkw.TYP \
 		--output-dir="$PKW_DIR" \
-		$MKGMAP_FILE_IMPORT
+		$MKGMAP_FILE_IMPORT \
+		$DEBUG_MKGMAP
 	
 	if [ ! -s "$PKW_DIR"/gmapsupp.img ]; then
 		echo "ERROR: pkw map could not be created"
@@ -489,14 +493,15 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$ADDR_DIR"/gmapsupp.img ]; then
 		rm "$ADDR_DIR"/*
 	fi
 	echo "Adresses"
-	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" $DEBUG_MKMAP --max-jobs --style-file="$AIOSTYLES_DIR"/addr_style/ --description='Adressen' \
+	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" --max-jobs --style-file="$AIOSTYLES_DIR"/addr_style/ --description='Adressen' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=5 --product-id=40 \
 		--series-name="OSM-AllInOne-$ISO-Addr" --family-name=ADRESSEN --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"1001 --draw-priority=20 --add-pois-to-areas --transparent \
 		$MKGMAP_OPTION_TDBFILE \
 		--gmapsupp "$TYP_DIR"/addr.TYP \
 		--output-dir="$ADDR_DIR" \
-		$MKGMAP_FILE_IMPORT
+		$MKGMAP_FILE_IMPORT \
+		$DEBUG_MKGMAP
 		
 	if [ ! -s "$ADDR_DIR"/gmapsupp.img ]; then
 		echo "ERROR: address map could not be created"
@@ -524,14 +529,15 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$FIXME_DIR"/gmapsupp.img ]; then
 		rm "$FIXME_DIR"/*
 	fi
 	echo "Fixme"
-	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" $DEBUG_MKMAP --max-jobs --style-file="$AIOSTYLES_DIR"/fixme_style/ --description='Fixme_Layer' \
+	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" --max-jobs --style-file="$AIOSTYLES_DIR"/fixme_style/ --description='Fixme_Layer' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=3 --product-id=33 \
 		--series-name="OSM-AllInOne-$ISO-Fixme" --family-name=FIXME --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"2001 --draw-priority=22 --transparent \
 		$MKGMAP_OPTION_TDBFILE \
 		--gmapsupp "$TYP_DIR"/fixme.TYP \
 		--output-dir="$FIXME_DIR" \
-		$MKGMAP_FILE_IMPORT
+		$MKGMAP_FILE_IMPORT \
+		$DEBUG_MKGMAP
 	
 	if [ ! -s "$FIXME_DIR"/gmapsupp.img ]; then
 		echo "ERROR: fixme map could not be created"
@@ -566,7 +572,8 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BOUNDARY_DIR"/gmapsupp.img ]; then
 		$MKGMAP_OPTION_TDBFILE \
 		--gmapsupp "$TYP_DIR"/boundary.TYP \
 		--output-dir="$BOUNDARY_DIR" \
-		$MKGMAP_FILE_IMPORT
+		$MKGMAP_FILE_IMPORT \
+		$DEBUG_MKGMAP
 	
 	if [ ! -s "$BOUNDARY_DIR"/gmapsupp.img ]; then
 		echo "ERROR: boundary map could not be created"
@@ -601,8 +608,9 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$MAXSPEED_DIR"/gmapsupp.img ]; then
 		$MKGMAP_OPTION_TDBFILE \
 		--gmapsupp "$TYP_DIR"/maxspeed.TYP \
 		--output-dir="$MAXSPEED_DIR" \
-		$MKGMAP_FILE_IMPORT
-	
+		$MKGMAP_FILE_IMPORT \
+		$DEBUG_MKGMAP
+		
 	if [ ! -s "$MAXSPEED_DIR"/gmapsupp.img ]; then
 		echo "ERROR: maxspeed map could not be created"
 		exit 1
@@ -684,7 +692,8 @@ if [ ! -z $OSBSQL_BIN ]; then
 			$MKGMAP_OPTION_TDBFILE \
 			--gmapsupp "$TYP_DIR"/osb.TYP \
 			--output-dir="$BUGS_DIR" \
-			$BUGS_DIR/*.pbf
+			$BUGS_DIR/*.pbf \
+			$DEBUG_MKGMAP
 #			-c "$BUGS_DIR"/template.args
 
 		if [ ! -s "$BUGS_DIR"/gmapsupp.img ]; then

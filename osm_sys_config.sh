@@ -51,7 +51,7 @@ GMAPOUT_DIR="."
 # If nothing goes wrong, leave the defaults. Of course you can play around at your own risk.
 
 # debug flags (set to empty string "" for disabling debug output)
-DEBUG_MKMAP="--verbose --list-styles --check-styles"
+DEBUG_MKGMAP="--verbose --list-styles --check-styles"
 DEBUG_OSMCONVERT="--verbose --statistics"
 DEBUG_OSMFILTER="--verbose"
 DEBUG_OSMOSIS="-v"
