@@ -34,11 +34,11 @@ SPLITTER_MAX_NODES=1000000 # maximum number of nodes per file (splitter will spl
 # osmconvert (converter between nearly all important OSM data formats) from http://wiki.openstreetmap.org/wiki/Osmconvert
 # osmosis (used for cropping data) http://wiki.openstreetmap.org/wiki/Osmosis
 # osbsql2osm (used for converting openstreetbugs)  http://tuxcode.org/john/osbsql2osm/osbsql2osm-latest.tar.gz 
-SPLITTER_JAR="$APPS_DIR/splitter/splitter-r306/splitter.jar"
-MKGMAP_JAR="$APPS_DIR/mkgmap/mkgmap-r2659/mkgmap.jar"
+SPLITTER_JAR="$APPS_DIR/splitter/splitter-r311/splitter.jar"
+MKGMAP_JAR="$APPS_DIR/mkgmap/mkgmap-r2815/mkgmap.jar"
 OSMFILTER_BIN="$APPS_DIR/osmfilter/osmfilter-1.2S/osmfilter"
 OSMCONVERT_BIN="$APPS_DIR/osmconvert/osmconvert-0.7T/osmconvert"
-GMT_BIN="$APPS_DIR/lgmt/lgmt08067/gmt"
+GMT_BIN="$APPS_DIR/lgmt/lgmt08159/gmt"
 JAVA_BIN="/usr/bin/java"
 OSMOSIS_BIN="$APPS_DIR/osmosis/osmosis-0.43.1/bin/osmosis"
 #OSBSQL_BIN="$APPS_DIR/osbsql2osm/osbsql2osm-0.3.1/src/osbsql2osm" # if empty string, OSB will not be processed (but script will create useable maps)

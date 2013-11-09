@@ -73,6 +73,16 @@ MKGMAP_FILE_IMPORT="$SPLITTER_DIR/*.pbf"
 # as of r 2464 the documentation comes along with the sourcecode in  /trunk/docs
 # as of Mar 2013 Java 1.7 should be used
 # as of May 10th 2013 r2596 the legacy format for preprocessed bounds is dropped
+# as of 2678: ignore-maxspeeds is removed
+# as of 2690: mkgmap:toll is available
+# as of 2701: Rename all mkgmap:access:* tags to mkgmap:* to make style files a bit shorter
+# as of 2705: some changes to default style file location were 
+# as of 2747: Add new addaccess and setaccess actions; mkgmap:access is no longer evaluated
+# as of 2760: java 1.7 is mandatory (1.6 support is dropped)
+# as of 2762: codepage for TYP and txt files is now UTF-8 per default. This makes --code-page pretty obsolete
+# as of 2763: mkgmap:bike to mkgmap:bicycle.
+# as of 2790: change in RoadMerger, check if --link-pois-to-ways still works
+# as of 2814: compare of names available name = $name:en { ... }
 
 
 ############################ the work starts here ###################
