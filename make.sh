@@ -370,6 +370,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BASEMAP_DIR"/gmapsupp.img ]; then
 		--link-pois-to-ways --route --drive-on-right \
 		--process-destination --process-exits \
 		--location-autofill=is_in,nearest \
+		--housenumbers \
 		$MKGMAP_OPTION_BOUNDS \
 		--gmapsupp "$AIOSTYLES_DIR"/basemap_typ.txt \
 		--output-dir="$BASEMAP_DIR"/ \
@@ -409,6 +410,8 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BIKE_DIR"/gmapsupp.img ]; then
 		--make-all-cycleways --check-roundabouts \
 		--link-pois-to-ways --route --drive-on-right \
 		--ignore-maxspeeds \
+		--location-autofill=is_in,nearest \
+		--housenumbers \
 		$MKGMAP_OPTION_BOUNDS \
 		"$AIOSTYLES_DIR"/bikemap_typ.txt\
 		--gmapsupp \
@@ -450,6 +453,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$PKW_DIR"/gmapsupp.img ]; then
 		--link-pois-to-ways --route --drive-on-right \
 		--process-destination --process-exits \
 		--location-autofill=is_in,nearest \
+		--housenumbers \
 		$MKGMAP_OPTION_BOUNDS \
 		--gmapsupp "$TYP_DIR"/pkw.TYP \
 		--output-dir="$PKW_DIR" \
