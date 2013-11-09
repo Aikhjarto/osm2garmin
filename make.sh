@@ -372,6 +372,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BASEMAP_DIR"/gmapsupp.img ]; then
 		--location-autofill=is_in,nearest \
 		--housenumbers \
 		$MKGMAP_OPTION_BOUNDS \
+		$MKGMAP_OPTION_TDBFILE \
 		--gmapsupp "$AIOSTYLES_DIR"/basemap_typ.txt \
 		--output-dir="$BASEMAP_DIR"/ \
 		$MKGMAP_FILE_IMPORT
@@ -414,6 +415,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BIKE_DIR"/gmapsupp.img ]; then
 		--housenumbers \
 		$MKGMAP_OPTION_BOUNDS \
 		"$AIOSTYLES_DIR"/bikemap_typ.txt\
+		$MKGMAP_OPTION_TDBFILE \
 		--gmapsupp \
 		--output-dir="$BIKE_DIR" \
 		$MKGMAP_FILE_IMPORT
@@ -455,6 +457,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$PKW_DIR"/gmapsupp.img ]; then
 		--location-autofill=is_in,nearest \
 		--housenumbers \
 		$MKGMAP_OPTION_BOUNDS \
+		$MKGMAP_OPTION_TDBFILE \
 		--gmapsupp "$TYP_DIR"/pkw.TYP \
 		--output-dir="$PKW_DIR" \
 		$MKGMAP_FILE_IMPORT
@@ -489,6 +492,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$ADDR_DIR"/gmapsupp.img ]; then
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=5 --product-id=40 \
 		--series-name="OSM-AllInOne-$ISO-Addr" --family-name=ADRESSEN --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"1001 --draw-priority=20 --add-pois-to-areas --transparent \
+		$MKGMAP_OPTION_TDBFILE \
 		--gmapsupp "$TYP_DIR"/addr.TYP \
 		--output-dir="$ADDR_DIR" \
 		$MKGMAP_FILE_IMPORT
@@ -523,6 +527,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$FIXME_DIR"/gmapsupp.img ]; then
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=3 --product-id=33 \
 		--series-name="OSM-AllInOne-$ISO-Fixme" --family-name=FIXME --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"2001 --draw-priority=22 --transparent \
+		$MKGMAP_OPTION_TDBFILE \
 		--gmapsupp "$TYP_DIR"/fixme.TYP \
 		--output-dir="$FIXME_DIR" \
 		$MKGMAP_FILE_IMPORT
@@ -557,6 +562,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BOUNDARY_DIR"/gmapsupp.img ]; then
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=6 --product-id=30 \
 		--series-name="OSM-AllInOne-$ISO-boundary" --family-name=boundary --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"3001 --draw-priority=21 --transparent \
+		$MKGMAP_OPTION_TDBFILE \
 		--gmapsupp "$TYP_DIR"/boundary.TYP \
 		--output-dir="$BOUNDARY_DIR" \
 		$MKGMAP_FILE_IMPORT
@@ -591,6 +597,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$MAXSPEED_DIR"/gmapsupp.img ]; then
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=84 --product-id=15 \
 		--series-name="OSM-AllInOne-$ISO-Maxspeed" --family-name=MAXSPEED --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"4001 --draw-priority=19 --transparent \
+		$MKGMAP_OPTION_TDBFILE \
 		--gmapsupp "$TYP_DIR"/maxspeed.TYP \
 		--output-dir="$MAXSPEED_DIR" \
 		$MKGMAP_FILE_IMPORT
@@ -673,6 +680,7 @@ if [ ! -z $OSBSQL_BIN ]; then
 			--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=3 --product-id=34 \
 			--series-name="OSM-AllInOne-$ISO-OSB" --family-name=OSB --area-name=EU --latin1 \
 			--mapname="$MAP_GRP"5001 --draw-priority=23 --no-poi-address --transparent \
+			$MKGMAP_OPTION_TDBFILE \
 			--gmapsupp "$TYP_DIR"/osb.TYP \
 			--output-dir="$BUGS_DIR" \
 			$BUGS_DIR/*.pbf
