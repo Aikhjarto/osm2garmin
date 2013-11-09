@@ -19,96 +19,18 @@
 # Known minor Bug: there is a rm-warning on puring already empty directories
 # Known Bug: if osmosis is interrupted (out of memory, hdd full, abort by CTRL-C) it leaves a near empty---but existing---pbf file. Uppon a consecutive execution of the script, osmosis isn't called again to finished it's job.
 
+##################### load map config ################################
+source osm_map_config.sh
+
 ##################### system setting section ##########################
-# You'll have to adjust the variables to match your system.
+# You'll have to adjust the variables to match your system in osm_sys_config.sh
+source osm_sys_config.sh
 
-# directories where auxiliar files can be found (without trailing slashes)
-# AIOSTYLES: https://github.com/berndw1960/aiostyles
-# 	If you want to use alternative styles you'll probably have to adjust the script.
-# 	Possibly alternatives include: http://wiki.openstreetmap.org/wiki/User:Computerteddy
-# TYP files: serveral sources like 
-# 	http://www.avdweb.nl/gps/garmin/improved-garmin-map-view-with-typ-files.html
-#	http://www.cferrero.net/maps/guide_to_TYPs.html
-# 	http://pinns.co.uk/osm/typwiz3.html
-#	http://wiki.openstreetmap.org/wiki/User:Computerteddy
-# APPS: see hints in parameters block below
-# TEMP_DIR: any directory that can hold several gigabytes of temporary data
-AIOSTYLES_DIR=$HOME"/osm/aiostyles"
-TYP_DIR=$HOME"/osm/TYP"
-APPS_DIR=$HOME"/osm/apps"
-POLY_DIR=$HOME"/osm/poly"
-
-# system settings
-#TEMP_DIR="$HOME/noBackup/osmtemp"
-TEMP_DIR=/pub/tmp/osmtemp
-XmxRAM="-Xmx2048M" # max ram available to java for splitter and mkgmap
+XmxRAM="-Xmx$JAVA_RAM" # max ram available to java for splitter and mkgmap
 if [ ! -d "$TEMP_DIR/osmosis" ]; then
 	mkdir -p "$TEMP_DIR/osmosis";
 fi
-export JAVACMD_OPTIONS="-Xmx3G -server -Djava.io.tmpdir=$TEMP_DIR/osmosis" # java options for osmosis
-NICE_VAL="9" # values higher than 0 will reduce processor priority
-SPLITTER_MAX_NODES=1000000 # maximum number of nodes per file (splitter will split the whole map in according to this number)
-
-# jar files and binaries locations
-# splitter (splits up huge input files in manageable parts) from http://www.mkgmap.org.uk/splitter/
-# gmt (combines submaps to a single file) from http://www.gmaptool.eu/
-# mkgmap (converts OSM data to garmin's file format) from http://www.mkgmap.org.uk/snapshots/
-# osmfilter (used for boundary calculation; needed for address searches) from http://wiki.openstreetmap.org/wiki/Osmfilter
-# osmconvert (converter between nearly all important OSM data formats) from http://wiki.openstreetmap.org/wiki/Osmconvert
-# osmosis (used for cropping data) http://wiki.openstreetmap.org/wiki/Osmosis
-# osbsql2osm (used for converting openstreetbugs)  http://tuxcode.org/john/osbsql2osm/osbsql2osm-latest.tar.gz 
-SPLITTER_JAR="$APPS_DIR/splitter/splitter-r306/splitter.jar"
-MKGMAP_JAR="$APPS_DIR/mkgmap/mkgmap-r2659/mkgmap.jar"
-OSMFILTER_BIN="$APPS_DIR/osmfilter/osmfilter-1.2S/osmfilter"
-OSMCONVERT_BIN="$APPS_DIR/osmconvert/osmconvert-0.7T/osmconvert"
-GMT_BIN="$APPS_DIR/lgmt/lgmt08067/gmt"
-JAVA_BIN="/usr/bin/java"
-OSMOSIS_BIN="$APPS_DIR/osmosis/osmosis-0.43.1/bin/osmosis"
-OSBSQL_BIN="$APPS_DIR/osbsql2osm/osbsql2osm-0.3.1/src/osbsql2osm" # if empty string, OSB will not be processed (but script will create useable maps)
-
-# output folder (use "." for current folder)
-GMAPOUT_DIR="."
-
-######################### map settings ######################################
-# Which map should be build?
-# HINT: You should state a polygon even if you don't want to reduce the data in the input file. The polygon will also be used to crop openstreetbugs data!
-
-# Austria
-GEOFABRIK_CONTINENT_NAME="europe"
-GEOFABRIK_MAP_NAME="austria"
-COUNTRY_NAME="Austria"
-COUNTRY_ABBR="AUT" #three digit country abbreviatin, see resources/LocatorConfig.xml from mkgmap for examples
-MAP_GRP="8324" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
-ISO="AT" # iso abbreviation of country
-POLY="UpperAustria" # part of austria
-#POLY="Austria_Vicinity" # poly just to reduce data from openstreetbugs
-
-# Cut out a piece of Europe
-#GEOFABRIK_MAP_NAME="europe-latest"
-#COUNTRY_NAME="AustriaVicinity"
-#COUNTRY_ABBR="EU"
-#MAP_GRP="6800"
-#ISO="EU"
-#POLY="Austria_Vicinity"
-
-# Germany
-#GEOFABRIK_CONTINENT_NAME="europe"
-#GEOFABRIK_MAP_NAME="germany"
-#COUNTRY_NAME="Germany"
-#COUNTRY_ABBR="DEU"
-#MAP_GRP="7024" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
-#ISO="DE" # iso abbreviation of country
-
-
-################ internal settings ##################################
-# If nothing goes wrong, leave the defaults. Of course you can play around at your own risk.
-
-# debug flags (set to empty string "" for disabling debug output)
-DEBUG_MKMAP="--verbose --list-styles"
-DEBUG_OSMCONVERT="--verbose --statistics"
-DEBUG_OSMFILTER="--verbose"
-DEBUG_OSMOSIS="-v"
-DEBUG_GMT="-v"
+export JAVACMD_OPTIONS="-Xmx$JAVA_RAM -server -Djava.io.tmpdir=$TEMP_DIR/osmosis" # java options for osmosis
 
 ## parition the temporary directory
 # temporary folders for separate maps
