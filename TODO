@@ -11,7 +11,7 @@ Features
 
 Improvements
 ============
-* use default mkgmap as style
+* make styles optional (use mkgmap's internal default if not styles are available)
 
 * mkgmap:road-speed, mkgmap:road-speed-max, mkgmap:road-speed-min
 

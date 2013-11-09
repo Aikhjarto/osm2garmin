@@ -34,6 +34,7 @@ export JAVACMD_OPTIONS="-Xmx$JAVA_RAM -server -Djava.io.tmpdir=$TEMP_DIR/osmosis
 
 ## parition the temporary directory
 # temporary folders for separate maps
+DEFAULTMAP_DIR="$TEMP_DIR/gdefaultmap"
 BASEMAP_DIR="$TEMP_DIR/gbasemap"
 PKW_DIR="$TEMP_DIR/gpkw"
 BIKE_DIR="$TEMP_DIR/gbike"
@@ -348,6 +349,50 @@ else
 	echo "Already there!"
 fi
 
+
+### Basemap (routable map for everyday usage)
+echo "-------------------->gdefaultmap @"`date`
+if [ "$OSM_SRC_FILE_PBF" -nt "$DEFAULTMAP_DIR"/gmapsupp.img ]; then
+	if [ ! -d "$DEFAULTMAP_DIR" ]; then
+		mkdir -p "$DEFAULTMAP_DIR"
+		if [ $? -ne 0 ]; then
+	  		echo "ERROR creating $DEFAULTMAP_DIR"
+	  		exit 1
+		fi
+	else
+		rm "$DEFAULTMAP_DIR"/*
+	fi
+	echo "Basemap"
+	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" --max-jobs --description='Openstreetmap' \
+		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=4 --product-id=45 \
+		--series-name="OSM-AllInOne-$ISO-bmap" --family-name=OSM --area-name=EU --latin1 \
+		--mapname="$MAP_GRP"0001 --draw-priority=10 \
+		--add-pois-to-areas --poi-address \
+		--make-all-cycleways --check-roundabouts \
+		--link-pois-to-ways --route --drive-on-right \
+		--process-destination --process-exits \
+		--location-autofill=is_in,nearest \
+		--housenumbers \
+		$MKGMAP_OPTION_BOUNDS \
+		$MKGMAP_OPTION_TDBFILE \
+		--gmapsupp \
+		--output-dir="$DEFAULTMAP_DIR"/ \
+		$MKGMAP_FILE_IMPORT \
+		$DEBUG_MKGMAP
+		
+	
+	if [ ! -s "$DEFAULTMAP_DIR"/gmapsupp.img ]; then
+		echo "ERROR: defaultmap could not be created"
+		exit 1
+	fi
+	
+	echo `du -hs "$DEFAULTMAP_DIR"` " " `du -hs "$DEFAULTMAP_DIR"/gmapsupp.img`
+	if [ "$KEEP_TMP_FILE" != "" ]; then
+		rm "$DEFAULTMAP_DIR"/$MAP_GRP*.img # clean up, since mkgmap does not
+	fi
+else
+	echo "Already there!"
+fi
 
 ### Basemap (routable map for everyday usage)
 echo "-------------------->gbasemap @"`date`
@@ -735,6 +780,19 @@ else
 	OSB_MERGE=""
 fi
 
+MAP_POSTFIX="default"
+echo "-->Defaultmap @"`date`" postfix: "$MAP_POSTFIX
+if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
+	cp "$DEFAULTMAP_DIR"/gmapsupp.img "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img
+	if [ $? -ne 0 ]; then
+		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
+		exit 1
+	fi
+else
+	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+fi 
+
+
 MAP_POSTFIX="base"
 echo "-->Basemap @"`date`" postfix: "$MAP_POSTFIX
 if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
@@ -770,6 +828,22 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTF
 else
 	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 fi
+
+MAP_POSTFIX="default_overlays"
+echo "-->Defaultmap @"`date`" postfix: "$MAP_POSTFIX
+if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
+	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
+		"$DEFAULTMAP_DIR"/gmapsupp.img \
+		"$ADDR_DIR"/gmapsupp.img \
+		"$MAXSPEED_DIR"/gmapsupp.img \
+		"$BOUNDARY_DIR"/gmapsupp.img		
+	if [ $? -ne 0 ]; then
+		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
+		exit 1
+	fi
+else
+	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+fi 
 
 MAP_POSTFIX="base_overlays"
 echo "-->Basemap @"`date`" postfix: "$MAP_POSTFIX
