@@ -135,19 +135,19 @@ OSMOSIS_START="nice -n $NICE_VAL $OSMOSIS_BIN"
 
 # check for auxiliary files
 if [ ! -d $AIOSTYLES_DIR ]; then
-	echo "style directory $AIOSTYLES_DIR not found";
+	echo "ERROR: style directory $AIOSTYLES_DIR not found";
 	exit 1
 fi
 
 ### Download maps if not already present (just convert is pbf is present)
 
-echo "----------------->Preprocess map"
+echo "-->Preprocess map @"`date`
 if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then 
 # TODO: also check if newer version is available on server
 	if [ ! -d "$OSM_SRC_DIR" ]; then
 	 	mkdir -p "$OSM_SRC_DIR"
 	 	if [ $? -ne 0 ]; then
-	 		echo "ERROR creating $OSM_SRC_DIR";
+	 		echo "ERROR: creating $OSM_SRC_DIR";
 			exit 1
 		fi
 	fi
@@ -160,11 +160,11 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 			DOWNLOAD_URL="http://download.geofabrik.de/openstreetmap/$GEOFABRIK_CONTINENT_NAME/$GEOFABRIK_MAP_NAME.osm.pbf"
 		fi
 		
-		echo "-------------> Download map started @"`date`
+		echo "---> Download map started @"`date`
 		if [ ! -d "$OSMCONVERT_WORKDIR" ]; then
 			mkdir "$OSMCONVERT_WORKDIR"
 			if [ $? -ne 0 ]; then
-				echo "ERROR creating $OSMCONVERT_WORKDIR"
+				echo "ERROR: Couldn't create $OSMCONVERT_WORKDIR"
 				exit 1
 			fi
 		else
@@ -188,7 +188,7 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 			fi
 			
 		else
-			echo "------>download PBF and convert with a cropping polygon"
+			echo "--->download PBF and convert with a cropping polygon @"`date`
 			# complete-ways cannot be used then reading from incomplete file, so file is downloaded first. Then the polygon is applied and in parallel the file is converted to o5m
 			#wget -O - $DOWNLOAD_URL  | \
 			#	tee >($OSMCONVERT_START - $DEBUG_OSMCONVERT $OSMCONVERT_CUT_OPTIONS -o=$OSM_SRC_FILE_PBF) | \
@@ -212,7 +212,7 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 			if [ ! -d "$TEMP_DIR"/osmosis ]; then
 				mkdir "$TEMP_DIR"/osmosis
 				if [ $? -ne 0 ]; then
-					echo "ERROR creating $TEMP_DIR/osmosis"
+					echo "ERROR: creating $TEMP_DIR/osmosis"
 					exit 1
 				fi
 			else
@@ -220,10 +220,10 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 			fi		
 			
 			if [ ! -z $ENABLE_PRECISE_CROP ]; then
-				echo "->Precise cropping enabled!"
+				#echo "---->Precise cropping enabled!"
 				OSMOSIS_POLY_OPTIONS="completeWays=yes completeRelations=yes"
 			else
-				echo "->Precise cropping disabled!"
+				#echo "---->Precise cropping disabled!"
 				OSMOSIS_POLY_OPTONS=""
 			fi
 			
@@ -237,14 +237,14 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 			
 			# abort if error (can crash frequently on low powered machines and huge input maps (e.g. a whole continent)
 			if [ $? -ne 0 ]; then
-				echo "ERROR while appling polygon file! @"`date`
+				echo "ERROR: Osmosis crashed while appling polygon file! @"`date`
 				# remove partially created file (most of the time, just an empty file is created, but this interferes with the -nt tests in this script)
-				echo "Removing $OSM_SRC_FILE_PBF"
+				echo "--->Removing $OSM_SRC_FILE_PBF @"`date`
 				rm "$OSM_SRC_FILE_PBF"
 				rm "$TEMP_DIR/osmosis/tmp.pbf"
 				exit 1
 			else
-				echo "Finshed cropping @"`date`
+				echo "--->Finshed cropping @"`date`
 				mv "$TEMP_DIR/osmosis/tmp.pbf" "$OSM_SRC_FILE_PBF"
 				if [ "$KEEP_TMP_FILE" != "" ]; then
 					# remove raw (uncutted, thus huge) file
@@ -256,13 +256,13 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 
 	fi
 else
-	echo "-------->Source map already present!"
+	echo "--->Source map already present! @"`date`
 fi
 
 ### generate boundary files (if not existing or older than pbf file)
 # TODO: o5M file is only needed for creating boundaries. Osmfilter, which extracts the boundaries can not read pbf right now. Osmosis could but is much slower than osmfilter
 
-echo "------------------->osmfilter (generate boundary files)"
+echo "-->osmfilter (generate boundary files) @"`date`
 if [ ! -z $ENABLE_BOUNDS ]; then
 	if [ "$OSM_SRC_FILE_PBF" -nt "$BOUNDS_STAT_FILE" ]; then
 		if [ ! -d "$BOUNDS_DIR" ]; then
@@ -272,10 +272,10 @@ if [ ! -z $ENABLE_BOUNDS ]; then
 		# convert from pbf to o5m since osmfilter does only understand o5m format
 		# caution o5m format needs about twice the harddisk-space of the pbf format
 		if [ "$OSM_SRC_FILE_PBF" -nt "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_O5M" ]; then
-			echo "---------->convert to o5m @"`date`
+			echo "--->convert to o5m @"`date`
 			$OSMCONVERT_START $DEBUG_OSMCONVERT -t="$OSMCONVERT_WORKDIR"/tmp "$OSM_SRC_FILE_PBF" --out-o5m -o="$OSM_SRC_FILE_O5M"
 			if [ $? -ne 0 ]; then 
-				echo "ERROR while converting pbf input to o5m for boundaries failed! "`date`
+				echo "ERROR: Converting pbf input to o5m for boundaries failed! @"`date`
 				exit 1
 			else
 				echo `du -hs $OSM_SRC_FILE_O5M`
@@ -283,14 +283,14 @@ if [ ! -z $ENABLE_BOUNDS ]; then
 		fi
 		
 		# Cannot pipeline pbf to o5m convertion with filtering bounds since osmfilter needs random access to it's inputs.		
-		echo "---------------------> extracting bounds info from map @"`date`
+		echo "---> extracting bounds info from map @"`date`
 		if [ "$OSM_SRC_FILE_O5M" -nt "$BOUNDS_FILE.o5m" ]; then
 			# extract boundary information from source 
 			$OSMFILTER_START "$OSM_SRC_FILE_O5M" $DEBUG_OSMFILTER -t="$TEMP_DIR/osmfilter_temp" --keep-nodes= \
 				--keep-ways-relations="boundary=administrative =postal_code postal_code=" \
 				-o="$BOUNDS_FILE.o5m"
 			if [ $? -ne 0 ]; then
-				echo "ERROR while filtering boundaries @"`date`
+				echo "ERROR: Osmfilter crashed while filtering boundaries @"`date`
 				exit 1
 			else
 				echo `du -hs "$BOUNDS_FILE.o5m"`
@@ -299,7 +299,7 @@ if [ ! -z $ENABLE_BOUNDS ]; then
 		fi
 			
 		### convert to *.bnd files
-		echo "--------------------->creating bounds folder for mkgmap @"`date`
+		echo "--->creating bounds folder for mkgmap @"`date`
 		rm "$BOUNDS_DIR"/* # delete old files
 	#	$JAVA_START $XmxRAM -jar $MKGMAP_JAR --max-jobs --verbose \
 	#		--bounds=$BOUNDS_DIR --createboundsfile=$BOUNDS_FILE.pbf
@@ -307,36 +307,36 @@ if [ ! -z $ENABLE_BOUNDS ]; then
 			"$BOUNDS_FILE.o5m" \
 			"$BOUNDS_DIR"
 		if [ $? -ne 0 ]; then
-			echo "ERROR while generating boundary file @"`date`
+			echo "ERROR: Mkgmap crashed while generating boundary file @"`date`
 			exit 1
 		else
 			echo `du -hs "$BOUNDS_DIR"`
 		fi
 	
 		### cleanup 
-		echo "finished boundary processing @"`date` | tee "$BOUNDS_STAT_FILE"
+		echo "--->finished boundary processing @"`date` | tee "$BOUNDS_STAT_FILE"
 		if [ "$KEEP_TMP_FILE" != "" ]; then
 			rm "$OSM_SRC_FILE_O5M" # delete o5m input file since only the pbf is used further
 		fi
 	else
-		echo "Already there!"
+		echo "--->Already there! @"`date`
 	fi
 	MKGMAP_OPTION_BOUNDS="--index --location-autofill=bounds --bounds=$BOUNDS_DIR";
 else
-	echo "Bounds not needed!"
+	echo "--->Bounds not needed! @"`date`
 	MKGMAP_OPTION_BOUNDS=""
 	
 fi
 
 
 ### split map to reduce overall memory consumption
-echo "-------------------->splitter @"`date`
+echo "-->splitter @"`date`
 SPLITTER_STAT_FILE=$TEMP_DIR/splitter_finished
 if [ ! "$SPLITTER_STAT_FILE" -nt "$OSM_SRC_FILE_PBF" ]; then 
 	if [ ! -d "$SPLITTER_DIR" ]; then
 		mkdir -p "$SPLITTER_DIR"
 		if [ $? -ne 0 ]; then
-	  		echo "ERROR creating $SPLITTER"
+	  		echo "ERROR: Couldn't create $SPLITTER"
 		  	exit 1
 		fi
 	else
@@ -347,28 +347,28 @@ if [ ! "$SPLITTER_STAT_FILE" -nt "$OSM_SRC_FILE_PBF" ]; then
 		--mapid="$MAP_GRP"0345 --max-nodes=$SPLITTER_MAX_NODES --keep-complete=true \
 		--output-dir="$SPLITTER_DIR" --write-kml=areas.kml "$OSM_SRC_FILE_PBF"
 	echo `du -hs "$SPLITTER_DIR"`
-	echo "Splitter finished @"`date` | tee "$SPLITTER_STAT_FILE"
+	echo "--->Splitter finished @"`date` | tee "$SPLITTER_STAT_FILE"
 else
-	echo "Already there!"
+	echo "--->Already there! @"`date`
 fi
 
 
 ### Basemap (routable map for everyday usage)
-echo "-------------------->gdefaultmap @"`date`
+echo "-->gdefaultmap @"`date`
 if [ "$OSM_SRC_FILE_PBF" -nt "$DEFAULTMAP_DIR"/gmapsupp.img ]; then
 	if [ ! -d "$DEFAULTMAP_DIR" ]; then
 		mkdir -p "$DEFAULTMAP_DIR"
 		if [ $? -ne 0 ]; then
-	  		echo "ERROR creating $DEFAULTMAP_DIR"
+	  		echo "ERROR: Couldn't create $DEFAULTMAP_DIR"
 	  		exit 1
 		fi
 	else
 		rm "$DEFAULTMAP_DIR"/*
 	fi
-	echo "Basemap"
+
 	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" --max-jobs --description='Openstreetmap' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=4 --product-id=45 \
-		--series-name="OSM-AllInOne-$ISO-bmap" --family-name=OSM --area-name=EU --latin1 \
+		--series-name="OSM-Default-$ISO-bmap" --family-name=OSM --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"0001 --draw-priority=10 \
 		--add-pois-to-areas --poi-address \
 		--make-all-cycleways --check-roundabouts \
@@ -389,27 +389,27 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$DEFAULTMAP_DIR"/gmapsupp.img ]; then
 		exit 1
 	fi
 	
-	echo `du -hs "$DEFAULTMAP_DIR"` " " `du -hs "$DEFAULTMAP_DIR"/gmapsupp.img`
+	echo "---> size: " `du -hs "$DEFAULTMAP_DIR"` " " `du -hs "$DEFAULTMAP_DIR"/gmapsupp.img` " @"`date`
 	if [ "$KEEP_TMP_FILE" != "" ]; then
 		rm "$DEFAULTMAP_DIR"/$MAP_GRP*.img # clean up, since mkgmap does not
 	fi
 else
-	echo "Already there!"
+	echo "--->Already there! @"`date`
 fi
 
 ### Basemap (routable map for everyday usage)
-echo "-------------------->gbasemap @"`date`
+echo "-->gbasemap @"`date`
 if [ "$OSM_SRC_FILE_PBF" -nt "$BASEMAP_DIR"/gmapsupp.img ]; then
 	if [ ! -d "$BASEMAP_DIR" ]; then
 		mkdir -p "$BASEMAP_DIR"
 		if [ $? -ne 0 ]; then
-	  		echo "ERROR creating $BASEMAP_DIR"
+	  		echo "ERROR: Couldn't create $BASEMAP_DIR"
 	  		exit 1
 		fi
 	else
 		rm "$BASEMAP_DIR"/*
 	fi
-	echo "Basemap"
+
 	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" --max-jobs --style-file="$AIOSTYLES_DIR"/basemap_style/ --description='Openstreetmap' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=4 --product-id=45 \
 		--series-name="OSM-AllInOne-$ISO-bmap" --family-name=OSM --area-name=EU --latin1 \
@@ -433,27 +433,27 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BASEMAP_DIR"/gmapsupp.img ]; then
 		exit 1
 	fi
 	
-	echo `du -hs "$BASEMAP_DIR"` " " `du -hs "$BASEMAP_DIR"/gmapsupp.img`
+	echo "---> size: " `du -hs "$BASEMAP_DIR"` " " `du -hs "$BASEMAP_DIR"/gmapsupp.img` " @"`date`
 	if [ "$KEEP_TMP_FILE" != "" ]; then
 		rm "$BASEMAP_DIR"/$MAP_GRP*.img # clean up, since mkgmap does not
 	fi
 else
-	echo "Already there!"
+	echo "---> Already there! @"`date`
 fi
 
 ### bikemap
-echo "-------------------->bikemap @"`date`
+echo "-->bikemap @"`date`
 if [ "$OSM_SRC_FILE_PBF" -nt "$BIKE_DIR"/gmapsupp.img ]; then
 	if [ ! -d "$BIKE_DIR" ]; then
 		mkdir -p "$BIKE_DIR"
 		if [ $? -ne 0 ]; then
-			echo "ERROR creating $BIKE_DIR"
+			echo "ERROR: Couldn't create $BIKE_DIR"
 			exit 1
 		fi
 	else
 		rm "$BIKE_DIR"/*
 	fi
-	echo "Bike map"
+
 	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" --max-jobs --style-file="$AIOSTYLES_DIR"/bikemap_style/ --description='Openstreetmap_Bike' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=4 --product-id=45 \
 		--series-name="OSM-AllInOne-$ISO-bike" --family-name=OSM_BIKE --area-name=EU --latin1 \
@@ -477,27 +477,27 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BIKE_DIR"/gmapsupp.img ]; then
 		exit 1
 	fi
 	
-	echo `du -hs "$BIKE_DIR"` " " `du -hs "$BIKE_DIR"/gmapsupp.img`
+	echo "---> size: " `du -hs "$BIKE_DIR"` " " `du -hs "$BIKE_DIR"/gmapsupp.img` " @"`date`
 	if [ "$KEEP_TMP_FILE" != "" ]; then	
 		rm "$BIKE_DIR"/$MAP_GRP*.img # clean up, since mkgmap does not
 	fi
 else
-	echo "Already there!"
+	echo "---> Already there! @"`date`
 fi
 	
 ### PKW map
-echo "-------------------->gpkw @"`date`
+echo "-->gpkw @"`date`
 if [ "$OSM_SRC_FILE_PBF" -nt "$PKW_DIR"/gmapsupp.img ]; then
 	if [ ! -d "$PKW_DIR" ]; then
 		mkdir -p "$PKW_DIR"
 		if [ $? -ne 0 ]; then
-			echo "ERROR creating $PKW_DIR"
+			echo "ERROR: Couldn't create $PKW_DIR"
 			exit 1
 		fi
 	else
 		rm "$PKW_DIR"/*
 	fi
-	echo "PKW map"
+
 	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" --max-jobs --style-file="$AIOSTYLES_DIR"/pkw_style/ --description='Openstreetmap_PKW' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=4 --product-id=45 \
 		--series-name="OSM-AllInOne-$ISO-pkw" --family-name=OSM_PKW --area-name=EU --latin1 \
@@ -520,27 +520,27 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$PKW_DIR"/gmapsupp.img ]; then
 		exit 1
 	fi
 
-	echo `du -hs "$PKW_DIR"` " " `du -hs "$PKW_DIR"/gmapsupp.img`
+	echo "---> size: " `du -hs "$PKW_DIR"` " " `du -hs "$PKW_DIR"/gmapsupp.img` " @"`date`
 	if [ "$KEEP_TMP_FILE" != "" ]; then	
 		rm "$PKW_DIR"/$MAP_GRP*.img # clean up, since mkgmap does not
 	fi
 else
-	echo "Already there!"
+	echo "---> Already there! @"`date`
 fi
 
 ### Addresses (Overlay map with pretty good visible address tags)
-echo "-------------------->gaddr @"`date`
+echo "-->gaddr @"`date`
 if [ "$OSM_SRC_FILE_PBF" -nt "$ADDR_DIR"/gmapsupp.img ]; then
 	if [ ! -d "$ADDR_DIR" ]; then
 		mkdir -p "$ADDR_DIR"
 		if [ $? -ne 0 ]; then
-			echo "ERROR creating $ADDR_DIR"
+			echo "ERROR: Couldn't create $ADDR_DIR"
 			exit 1
 		fi
 	else
 		rm "$ADDR_DIR"/*
 	fi
-	echo "Adresses"
+
 	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" --max-jobs --style-file="$AIOSTYLES_DIR"/addr_style/ --description='Adressen' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=5 --product-id=40 \
 		--series-name="OSM-AllInOne-$ISO-Addr" --family-name=ADRESSEN --area-name=EU --latin1 \
@@ -556,27 +556,27 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$ADDR_DIR"/gmapsupp.img ]; then
 		exit 1
 	fi
 	
-	echo `du -hs "$ADDR_DIR"` " " `du -hs "$ADDR_DIR"/gmapsupp.img`
+	echo "---> size: " `du -hs "$ADDR_DIR"` " " `du -hs "$ADDR_DIR"/gmapsupp.img` " @"`date`
 	if [ "$KEEP_TMP_FILE" != "" ]; then
 		rm "$ADDR_DIR"/$MAP_GRP*.img # clean up, since mkgmap does not
 	fi
 else
-	echo "Already there!"
+	echo "---> Already there! @"`date`
 fi
 
 ### FixMes (fixmes in gaudy colors will bother you for every-day usage of your navigation device. So it's a separate map you can easily hide)
-echo "-------------------->gfixme @"`date`
+echo "-->gfixme @"`date`
 if [ "$OSM_SRC_FILE_PBF" -nt "$FIXME_DIR"/gmapsupp.img ]; then
 	if [ ! -d "$FIXME_DIR" ]; then
 		mkdir -p "$FIXME_DIR"
 		if [ $? -ne 0 ]; then
-			echo "ERROR creating $FIXME_DIR"
+			echo "ERROR: Couldn't create $FIXME_DIR"
 			exit 1
 		fi
 	else
 		rm "$FIXME_DIR"/*
 	fi
-	echo "Fixme"
+
 	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" --max-jobs --style-file="$AIOSTYLES_DIR"/fixme_style/ --description='Fixme_Layer' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=3 --product-id=33 \
 		--series-name="OSM-AllInOne-$ISO-Fixme" --family-name=FIXME --area-name=EU --latin1 \
@@ -592,27 +592,27 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$FIXME_DIR"/gmapsupp.img ]; then
 		exit 1
 	fi
 		
-	echo `du -hs "$FIXME_DIR"` " " `du -hs "$FIXME_DIR"/gmapsupp.img`
+	echo "---> size:" `du -hs "$FIXME_DIR"` " " `du -hs "$FIXME_DIR"/gmapsupp.img` " @"`date`
 	if [ "$KEEP_TMP_FILE" != "" ]; then
 		rm "$FIXME_DIR"/$MAP_GRP*.img # clean up, since mkgmap does not
 	fi
 else
-	echo "Already there!"
+	echo "---> Already there! @"`date`
 fi
 
 ### Boundaries (as they often coincide with streets or rivers, you might want them in a seperate map to hide them)
-echo "-------------------->gboundary @"`date`
+echo "-->gboundary @"`date`
 if [ "$OSM_SRC_FILE_PBF" -nt "$BOUNDARY_DIR"/gmapsupp.img ]; then
 	if [ ! -d "$BOUNDARY_DIR" ]; then
 		mkdir -p "$BOUNDARY_DIR"
 		if [ $? -ne 0 ]; then
-			echo "ERROR creating $BOUNDARY_DIR"
+			echo "ERROR: Couldn't create $BOUNDARY_DIR"
 			exit 1
 		fi
 	else
 		rm "$BOUNDARY_DIR"/*
 	fi
-	echo "Boundary"
+
 	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" $DEBUG_MKMAP --max-jobs --style-file="$AIOSTYLES_DIR"/boundary_style/ --description='Boundary_Layer' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=6 --product-id=30 \
 		--series-name="OSM-AllInOne-$ISO-boundary" --family-name=boundary --area-name=EU --latin1 \
@@ -628,27 +628,27 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BOUNDARY_DIR"/gmapsupp.img ]; then
 		exit 1
 	fi
 	
-	echo `du -hs "$BOUNDARY_DIR"` " " `du -hs "$BOUNDARY_DIR"/gmapsupp.img`
+	echo "---> size: " `du -hs "$BOUNDARY_DIR"` " " `du -hs "$BOUNDARY_DIR"/gmapsupp.img` " @"`date`
 	if [ "$KEEP_TMP_FILE" != "" ]; then
 		rm "$BOUNDARY_DIR"/$MAP_GRP*.img # clean up, since mkgmap does not
 	fi
 else
-	echo "Alread there!"
+	echo "---> Alread there! @"`date`
 fi	
 
 ### Max Speed (as osm is not fully populated with speed limity, you might want a seperate map to hide them)
-echo "-------------------->gmaxspeed @"`date`
+echo "-->gmaxspeed @"`date`
 if [ "$OSM_SRC_FILE_PBF" -nt "$MAXSPEED_DIR"/gmapsupp.img ]; then
 	if [ ! -d "$MAXSPEED_DIR" ]; then
 		mkdir -p "$MAXSPEED_DIR"
 		if [ $? -ne 0 ]; then
-			echo "ERROR creating $MAXSPEED_DIR"
+			echo "ERROR: Couldn't create $MAXSPEED_DIR"
 			exit 1
 		fi
 	else
 		rm "$MAXSPEED_DIR"/*
 	fi
-	echo "Maxspeed"
+
 	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" $DEBUG_MKMAP --max-jobs --style-file="$AIOSTYLES_DIR"/maxspeed_style/ --description='Maxspeed' \
 		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=84 --product-id=15 \
 		--series-name="OSM-AllInOne-$ISO-Maxspeed" --family-name=MAXSPEED --area-name=EU --latin1 \
@@ -664,23 +664,22 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$MAXSPEED_DIR"/gmapsupp.img ]; then
 		exit 1
 	fi
 	
-	echo `du -hs "$MAXSPEED_DIR"` " " `du -hs "$MAXSPEED_DIR"/gmapsupp.img`
+	echo "---> size: "`du -hs "$MAXSPEED_DIR"` " " `du -hs "$MAXSPEED_DIR"/gmapsupp.img` " @"`date`
 	if [ "$KEEP_TMP_FILE" != "" ]; then
 		rm "$MAXSPEED_DIR"/$MAP_GRP*.img # clean up, since mkgmap does not
 	fi
 else
-	echo "Alread there!"
+	echo "---> Alread there! @"`date`
 fi
 
 ### Bugs from openstreetbugs
-echo "----------------------> gosb @"`date`
+echo "--> gosb @"`date`
 if [ ! -z $OSBSQL_BIN ]; then
-	echo "-------------------->gosb"
 	if [ "$OSM_SRC_FILE_PBF" -nt "$BUGS_DIR"/gmapsupp.img ]; then 
 		if [ ! -d "$BUGS_DIR" ]; then
 			mkdir -p "$BUGS_DIR"
 			if [ $? -ne 0 ]; then
-				echo "ERROR creating $BUGS_DIR"
+				echo "ERROR: Couldn't create $BUGS_DIR"
 				exit 1
 			fi
 		else
@@ -691,22 +690,22 @@ if [ ! -z $OSBSQL_BIN ]; then
 		ALLBUGS_PBF="$OSM_SRC_DIR/osb.pbf"
 		ALLBUGS_STATE_FILE="$OSM_SRC_DIR/osb.state"
 
-		echo "----> Download OSB @"`date`
+		echo "---> Download OSB @"`date`
 		if [ ! "$ALLBUGS_STATE_FILE" -nt "$OSM_SRC_FILE_PBF" ]; then
 			wget -O - http://openstreetbugs.schokokeks.org/dumps/osbdump_latest.sql.bz2 | nice -n $NICE_VAL bunzip2 | $OSBSQL_START > "$ALLBUGS_OSM"
 			if [ $? -ne 0 ]; then
-				echo "ERROR downloading OSB data!"
+				echo "ERROR: Wget had an error while downloading OSB data!"
 				exit 1
 			else
 				# write state file (to detect whether or not download was interrupted with STRG-C (not detectable via return value)
-				echo "successfull downloaded @"`date` >> "$ALLBUGS_STATE_FILE"
+				echo "---> successfull downloaded @"`date` | tee "$ALLBUGS_STATE_FILE"
 			fi
 		else
-			echo "Alread there!"
+			echo "---> Alread there! @"`date`
 		fi
 
 		if [ "$POLY" == "" ]; then
-			echo "converting OSB without poly @"`date`
+			echo "---> converting OSB without poly @"`date`
 			$OSMOSIS_START $DEBUG_OSMOSIS --read-xml file="$ALLBUGS_OSM" \
 				--sort \
 				--write-pbf file="$ALLBUGS_PBF"
@@ -716,23 +715,23 @@ if [ ! -z $OSBSQL_BIN ]; then
 			fi
 		else
 			# HINT: can't use osmconvert to crop polygon since OSB data is not sorted (osmconvert need sorted data)
-			echo "converting OSB with poly @"`date`
+			echo "---> converting OSB with poly @"`date`
 			$OSMOSIS_START $DEBUG_OSMOSIS --read-xml file="$ALLBUGS_OSM" \
 				--sort \
  				--bounding-polygon file="$POLY_DIR/$POLY.poly" $OSMOSIS_POLY_OPTIONS \
  				--write-pbf file="$ALLBUGS_PBF"
  			if [ $? -ne 0 ]; then
-				echo "ERROR applying polygon to OSB file!"
+				echo "ERROR: Osmosis crashed while applying polygon to OSB file!"
 				exit 1
 			fi
 		fi
 		
-		echo "splitting OSB @"`date`
+		echo "---> splitting OSB @"`date`
 		$JAVA_START $XmxRAM -jar "$SPLITTER_JAR" \
 		--mapid="$MAP_GRP"5001 --max-nodes=$SPLITTER_MAX_NODES --keep-complete=true \
 		--output-dir=$BUGS_DIR --write-kml=areas.kml $ALLBUGS_PBF
 		
-		echo "generating OSB @"`date`
+		echo "---> generating OSB @"`date`
 		$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" $DEBUG_MKMAP --max-jobs --style-file="$AIOSTYLES_DIR"/osb_style/ --description='Openstreetbugs' \
 			--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=3 --product-id=34 \
 			--series-name="OSM-AllInOne-$ISO-OSB" --family-name=OSB --area-name=EU --latin1 \
@@ -759,20 +758,20 @@ if [ ! -z $OSBSQL_BIN ]; then
 			rm "$ALLBUGS_OSM"
 		fi
 	else
-		echo "Already there!"
+		echo "---> Already there! @"`date`
 	fi
 fi
 
 ### purge splitted files (only *.img files are needed further)
 if [ "$KEEP_TMP_FILE" != "" ]; then
-	echo "Purging "`du -hs $SPLITTER_DIR`
+	echo "--> Purging "`du -hs $SPLITTER_DIR` " @"`date`
 	rm "$SPLITTER_DIR";
 fi
 
 
 
 ### Merge individual maps to a single *.img file
-echo "-------------------->merge @"`date`
+echo "-->merge @"`date`
 if [ ! -d "$GMAPOUT_DIR" ]; then
 	mkdir -p "$GMAPOUT_DIR"
 fi
@@ -784,7 +783,7 @@ else
 fi
 
 MAP_POSTFIX="default"
-echo "-->Defaultmap @"`date`" postfix: "$MAP_POSTFIX
+echo "--> Defaultmap @"`date`" postfix: "$MAP_POSTFIX
 if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
 	cp "$DEFAULTMAP_DIR"/gmapsupp.img "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img
 	if [ $? -ne 0 ]; then
@@ -792,12 +791,12 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTF
 		exit 1
 	fi
 else
-	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+	echo "--> gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 fi 
 
 
 MAP_POSTFIX="base"
-echo "-->Basemap @"`date`" postfix: "$MAP_POSTFIX
+echo "--> Basemap @"`date`" postfix: "$MAP_POSTFIX
 if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
 	cp "$BASEMAP_DIR"/gmapsupp.img "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img
 	if [ $? -ne 0 ]; then
@@ -805,11 +804,11 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTF
 		exit 1
 	fi
 else
-	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+	echo "---> gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 fi 
 
 MAP_POSTFIX="bike"
-echo "-->Bike @"`date`" postfix: "$MAP_POSTFIX
+echo "--> Bike @"`date`" postfix: "$MAP_POSTFIX
 if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
 	cp "$BIKE_DIR"/gmapsupp.img "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img
 	if [ $? -ne 0 ]; then
@@ -817,11 +816,11 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTF
 		exit 1
 	fi
 else
-	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+	echo "---> gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 fi
 
 MAP_POSTFIX="pkw"
-echo "-->PKW @"`date`" postfix: "$MAP_POSTFIX
+echo "--> PKW @"`date`" postfix: "$MAP_POSTFIX
 if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
 	cp "$PKW_DIR"/gmapsupp.img "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img
 	if [ $? -ne 0 ]; then
@@ -829,11 +828,11 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTF
 		exit 1
 	fi
 else
-	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+	echo "---> gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 fi
 
 MAP_POSTFIX="default_overlays"
-echo "-->Defaultmap @"`date`" postfix: "$MAP_POSTFIX
+echo "--> Defaultmap @"`date`" postfix: "$MAP_POSTFIX
 if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
 	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
 		"$DEFAULTMAP_DIR"/gmapsupp.img \
@@ -845,11 +844,11 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTF
 		exit 1
 	fi
 else
-	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+	echo "---> gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 fi 
 
 MAP_POSTFIX="base_overlays"
-echo "-->Basemap @"`date`" postfix: "$MAP_POSTFIX
+echo "--> Basemap @"`date`" postfix: "$MAP_POSTFIX
 if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
 	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
 		"$BASEMAP_DIR"/gmapsupp.img \
@@ -861,11 +860,11 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTF
 		exit 1
 	fi
 else
-	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+	echo "---> gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 fi 
 
 MAP_POSTFIX="bike_overlays"
-echo "-->Bike @"`date`" postfix: "$MAP_POSTFIX
+echo "--> Bike @"`date`" postfix: "$MAP_POSTFIX
 if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
 	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
 		"$BIKE_DIR"/gmapsupp.img \
@@ -877,11 +876,11 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTF
 		exit 1
 	fi
 else
-	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+	echo "---> gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 fi
 
 MAP_POSTFIX="pkw_overlays"
-echo "-->PKW @"`date`" postfix: "$MAP_POSTFIX
+echo "--> PKW @"`date`" postfix: "$MAP_POSTFIX
 if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
 	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
 		"$PKW_DIR"/gmapsupp.img \
@@ -893,12 +892,12 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTF
 		exit 1
 	fi
 else
-	echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+	echo "---> gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 fi
 
 if [ ! -z $OSBSQL_BIN ]; then
 	MAP_POSTFIX="base_with_bugs"
-	echo "-->Basemap @"`date`" postfix: "$MAP_POSTFIX
+	echo "--> Basemap @"`date`" postfix: "$MAP_POSTFIX
 	if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
 		$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
 			"$BASEMAP_DIR"/gmapsupp.img \
@@ -911,11 +910,11 @@ if [ ! -z $OSBSQL_BIN ]; then
 			exit 1
 		fi
 	else
-		echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+		echo "---> gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 	fi 
 
 	MAP_POSTFIX="bike_with_bugs"
-	echo "-->Bike @"`date`" postfix: "$MAP_POSTFIX
+	echo "--> Bike @"`date`" postfix: "$MAP_POSTFIX
 	if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
 		$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
 			"$BIKE_DIR"/gmapsupp.img \
@@ -928,11 +927,11 @@ if [ ! -z $OSBSQL_BIN ]; then
 			exit 1
 		fi
 	else
-		echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+		echo "---> gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 	fi
 
 	MAP_POSTFIX="pkw_with_bugs"
-	echo "-->PKW @"`date`" postfix: "$MAP_POSTFIX
+	echo "--> PKW @"`date`" postfix: "$MAP_POSTFIX
 	if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
 		$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
 			"$PKW_DIR"/gmapsupp.img \
@@ -945,13 +944,13 @@ if [ ! -z $OSBSQL_BIN ]; then
 			exit 1
 		fi
 	else
-		echo "gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+		echo "---> gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 	fi
 fi
 
 if [ "$KEEP_TMP_FILES" != "" ]; then
 	### removing temp files
-	echo "------------------->cleaning up temp files @"`date` 
+	echo "--> cleaning up temp files @"`date` 
 	rm "$OSM_SRC_DIR"
 	rm "$SPLITTER_DIR"
 	rm "$BOUNDS_DIR"
@@ -971,5 +970,5 @@ fi
 
 
 # plot time of finishing the script
-echo "------------------->finished @"`date`
+echo "-->finished @"`date`
 
