@@ -227,9 +227,10 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 				OSMOSIS_POLY_OPTONS=""
 			fi
 			
+			# don't write directly to $OSM_SRC_FILE_PBF. Osmosis will touch output file when started. If osmosis gets interrupted by e.g. CTRL-C, an unfinished PBF would be used if this script is restarted
  			$OSMOSIS_START $DEBUG_OSMOSIS --read-pbf-fast file="$OSM_WGET_TMP_FILE" --buffer \
  				--bounding-polygon file="$POLY_DIR/$POLY.poly" $OSMOSIS_POLY_OPTIONS --buffer \
- 				--write-pbf file="$OSM_SRC_FILE_PBF"
+ 				--write-pbf file="$TEMP_DIR/osmosis/tmp.pbf"
 #			OSMCONVERT_CUT_OPTIONS="-B=$POLY_DIR/$POLY.poly --complete-ways --complex-ways"
 #			$OSMCONVERT_START $OSM_WGET_TMP_FILE $DEBUG_OSMCONVERT $OSMCONVERT_CUT_OPTIONS -t=$OSMCONVERT_WORKDIR/tmp -o=$OSM_SRC_FILE_PBF
 			#TODO: replace osmosis with https://github.com/MaZderMind/osm-history-splitter which should be faster
@@ -240,9 +241,11 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 				# remove partially created file (most of the time, just an empty file is created, but this interferes with the -nt tests in this script)
 				echo "Removing $OSM_SRC_FILE_PBF"
 				rm "$OSM_SRC_FILE_PBF"
+				rm "$TEMP_DIR/osmosis/tmp.pbf"
 				exit 1
 			else
 				echo "Finshed cropping @"`date`
+				mv "$TEMP_DIR/osmosis/tmp.pbf" "$OSM_SRC_FILE_PBF"
 				if [ "$KEEP_TMP_FILE" != "" ]; then
 					# remove raw (uncutted, thus huge) file
 					rm "$OSM_WGET_TMP_FILE"
