@@ -227,8 +227,8 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 				OSMOSIS_POLY_OPTONS=""
 			fi
 			
- 			$OSMOSIS_START $DEBUG_OSMOSIS --read-pbf-fast file="$OSM_WGET_TMP_FILE" \
- 				--bounding-polygon file="$POLY_DIR/$POLY.poly" $OSMOSIS_POLY_OPTIONS \
+ 			$OSMOSIS_START $DEBUG_OSMOSIS --read-pbf-fast file="$OSM_WGET_TMP_FILE" --buffer \
+ 				--bounding-polygon file="$POLY_DIR/$POLY.poly" $OSMOSIS_POLY_OPTIONS --buffer \
  				--write-pbf file="$OSM_SRC_FILE_PBF"
 #			OSMCONVERT_CUT_OPTIONS="-B=$POLY_DIR/$POLY.poly --complete-ways --complex-ways"
 #			$OSMCONVERT_START $OSM_WGET_TMP_FILE $DEBUG_OSMCONVERT $OSMCONVERT_CUT_OPTIONS -t=$OSMCONVERT_WORKDIR/tmp -o=$OSM_SRC_FILE_PBF
