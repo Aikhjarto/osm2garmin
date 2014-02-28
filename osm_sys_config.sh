@@ -20,11 +20,11 @@ POLY_DIR=$HOME"/osm/poly"
 
 # system settings
 #TEMP_DIR="$HOME/noBackup/osmtemp"
-TEMP_DIR=/pub/tmp/osmtemp
-JAVA_RAM="2G" # max RAM memory available to java VM
+TEMP_DIR=/scratch/osmtemp
+JAVA_RAM="8G" # max RAM memory available to java VM
 
 NICE_VAL="9" # values higher than 0 will reduce processor priority
-SPLITTER_MAX_NODES=2000000 # maximum number of nodes per file (splitter will split the whole map in according to this number)
+SPLITTER_MAX_NODES=2000000 # (2000000) maximum number of nodes per file (splitter will split the whole map in according to this number)
 
 # jar files and binaries locations
 # splitter (splits up huge input files in manageable parts) from http://www.mkgmap.org.uk/splitter/
@@ -34,11 +34,11 @@ SPLITTER_MAX_NODES=2000000 # maximum number of nodes per file (splitter will spl
 # osmconvert (converter between nearly all important OSM data formats) from http://wiki.openstreetmap.org/wiki/Osmconvert
 # osmosis (used for cropping data) http://wiki.openstreetmap.org/wiki/Osmosis
 # osbsql2osm (used for converting openstreetbugs)  http://tuxcode.org/john/osbsql2osm/osbsql2osm-latest.tar.gz 
-SPLITTER_JAR="$APPS_DIR/splitter/splitter-r311/splitter.jar"
+SPLITTER_JAR="$APPS_DIR/splitter/splitter-r317/splitter.jar"
 MKGMAP_JAR="$APPS_DIR/mkgmap/mkgmap-r2815/mkgmap.jar"
 OSMFILTER_BIN="$APPS_DIR/osmfilter/osmfilter-1.2S/osmfilter"
 OSMCONVERT_BIN="$APPS_DIR/osmconvert/osmconvert-0.7T/osmconvert"
-GMT_BIN="$APPS_DIR/lgmt/lgmt08159/gmt"
+GMT_BIN="$APPS_DIR/lgmt/lgmt08186/gmt"
 JAVA_BIN="/usr/bin/java"
 OSMOSIS_BIN="$APPS_DIR/osmosis/osmosis-0.43.1/bin/osmosis"
 #OSBSQL_BIN="$APPS_DIR/osbsql2osm/osbsql2osm-0.3.1/src/osbsql2osm" # if empty string, OSB will not be processed (but script will create useable maps)
