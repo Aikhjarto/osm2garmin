@@ -20,7 +20,7 @@ POLY_DIR=$HOME"/osm/poly"
 
 # system settings
 #TEMP_DIR="$HOME/noBackup/osmtemp"
-TEMP_DIR=/scratch/osmtemp
+TEMP_DIR=/scratch/osmtemp2
 JAVA_RAM="8G" # max RAM memory available to java VM
 
 NICE_VAL="9" # values higher than 0 will reduce processor priority
@@ -56,3 +56,4 @@ DEBUG_OSMCONVERT="--verbose --statistics"
 DEBUG_OSMFILTER="--verbose"
 DEBUG_OSMOSIS="-v"
 DEBUG_GMT="-v"
+DEBUG_MD5="" # "--quiet" disables output of md5sum

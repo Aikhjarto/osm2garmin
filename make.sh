@@ -154,10 +154,11 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 
 	if [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 		# geofabrik's URL is differnt between countries and continents
+		GEOFABRIK_FILE="$GEOFABRIK_MAP_NAME-latest.osm.pbf"
 		if [ "$GEOFABRIK_CONTINENT_NAME" == "" ]; then
-			DOWNLOAD_URL="http://download.geofabrik.de/openstreetmap/$GEOFABRIK_MAP_NAME.osm.pbf"
+			DOWNLOAD_URL="http://download.geofabrik.de/openstreetmap/$GEOFABRIK_FILE"
 		else
-			DOWNLOAD_URL="http://download.geofabrik.de/openstreetmap/$GEOFABRIK_CONTINENT_NAME/$GEOFABRIK_MAP_NAME.osm.pbf"
+			DOWNLOAD_URL="http://download.geofabrik.de/openstreetmap/$GEOFABRIK_CONTINENT_NAME/$GEOFABRIK_FILE"
 		fi
 		
 		echo "---> Download map started @"`date`
@@ -170,7 +171,40 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 		else
 			rm "$OSMCONVERT_WORKDIR"/*
 		fi
-		# TODO: download and convert in parallel (should at least work if no cropping polygon is applied
+
+
+		# download md5 checksum (check for existent file to allow manually copying rather than downloading)
+		wget -O "$OSM_SRC_DIR/$GEOFABRIK_FILE.md5" "$DOWNLOAD_URL.md5"
+		if [ $? -ne 0 ]; then
+			echo "ERROR: Download of $DOWNLOAD_URL.md5 to $OSM_SRC_DIR/$GEOFABRIK_FILE.md5 failed"
+			exit 1;
+		fi
+
+		# download actual map (check for existent file to allow manually copying rather than downloading)	
+		if [  ! -f "$OSM_SRC_DIR/$GEOFABRIK_FILE" ]; then
+			wget -O  "$OSM_SRC_DIR/$GEOFABRIK_FILE" "$DOWNLOAD_URL"
+			if [ $? -ne 0 ]; then
+				echo "ERROR: Download of $DOWNLOAD_URL to $OSM_SRC_DIR/$GEOFABRIK_FILE failed"
+				exit 1
+			fi
+		fi
+		
+		echo "---> start check of md5 checksum" 
+		DIR_OLD=`pwd`
+		cd $OSM_SRC_DIR
+		md5sum $DEBUG_MD5 -c "$GEOFABRIK_FILE.md5" 
+		if [ $? -ne 0 ]; then
+			echo "ERROR: md5 check of map failed"; 
+			exit 1;
+		else
+			cd $DIR_OLD
+			# approve map file
+			OSM_WGET_TMP_FILE="$OSM_SRC_DIR/$GEOFABRIK_FILE"
+		fi
+			
+			
+		
+				
 		if [ "$POLY" == "" ]; then
 			# download and convert in parallel does not work well. When input buffer of osmconvert is full, wget is stalled until osmconvert clears an procresses its buffer. This likely results in wget timeouts.
 #			echo "download PBF and convert to o5m in parallel"
@@ -178,14 +212,10 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 #				tee $OSM_SRC_FILE_PBF | \
 #				$OSMCONVERT_START - $DEBUG_OSMCONVERT -t=$OSMCONVERT_WORKDIR -o=$OSM_SRC_FILE_O5M
 #			OSM_WGET_TMP_FILE=$TEMP_DIR/osmcopy/wget_tmp.osm.pbf
-			OSM_WGET_TMP_FILE="$OSM_SRC_FILE_PBF";
-			if [ ! -f "$OSM_WGET_TMP_FILE" ]; then
-				wget -O "$OSM_WGET_TMP_FILE" $DOWNLOAD_URL 
-				if [ $? -ne 0 ]; then
-					echo "ERROR: Download of $DOWNLOAD_URL to $OSM_WGET_TMP_FILE failed"
-					exit 1
-				fi
-			fi
+			
+			# simply rename file from g
+			mv "$OSM_WGET_TMP_FILE" "$OSM_SRC_FILE_PBF"
+			
 			
 		else
 			echo "---> download PBF and convert with a cropping polygon @"`date`
@@ -193,15 +223,9 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 			#wget -O - $DOWNLOAD_URL  | \
 			#	tee >($OSMCONVERT_START - $DEBUG_OSMCONVERT $OSMCONVERT_CUT_OPTIONS -o=$OSM_SRC_FILE_PBF) | \
 			#	$OSMCONVERT_START - $DEBUG_OSMCONVERT $OSM_CONVERT_CUT_OPTIONS -o=$OSM_SRC_FILE_O5M		
-			OSM_WGET_TMP_FILE=$TEMP_DIR/osmcopy/wget_tmp.osm.pbf
+			#OSM_WGET_TMP_FILE=$TEMP_DIR/osmcopy/wget_tmp.osm.pbf
+			
 
-			if [ ! -f "$OSM_WGET_TMP_FILE" ]; then
-				wget -O "$OSM_WGET_TMP_FILE" $DOWNLOAD_URL 
-				if [ $? -ne 0 ]; then
-					echo "ERROR: Download of $DOWNLOAD_URL to $OSM_WGET_TMP_FILE failed"
-					exit 1
-				fi
-			fi
 			# processing polygon on pdf and converting in parallel with two osmconvert instances is not reliable in current version (keeps crashing).
 #			$OSMCONVERT_START $OSM_WGET_TMP_FILE $DEBUG_OSMCONVERT $OSMCONVERT_CUT_OPTIONS --out-pbf | \
 # 				tee $OSM_SRC_FILE_PBF | \ 
