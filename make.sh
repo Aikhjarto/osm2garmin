@@ -85,6 +85,9 @@ MKGMAP_FILE_IMPORT="$SPLITTER_DIR/*.pbf"
 # as of 2763: mkgmap:bike to mkgmap:bicycle.
 # as of 2790: change in RoadMerger, check if --link-pois-to-ways still works
 # as of 2814: compare of names available name = $name:en { ... }
+# as of 2818: beautifyRoundabouts (enhanced placement of nodes to reduce bad angles)
+# as of 2827: change in labels mkgmap:label:1-4
+# as of 2906: merged the mergeroads branch. This makes maps better readable for the device but most likely is incomaptible with old style files (access, maxspeed and labels changed)
 
 
 ############################ the work starts here ###################
