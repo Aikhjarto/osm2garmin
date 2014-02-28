@@ -11,11 +11,11 @@
 # Austria
 GEOFABRIK_CONTINENT_NAME="europe"
 GEOFABRIK_MAP_NAME="austria"
-COUNTRY_NAME="Austria" # This name will be used as country on the navi
-COUNTRY_ABBR="AUT" #three digit country abbreviatin, see resources/LocatorConfig.xml from mkgmap for examples
+COUNTRY_NAME="Austria" # This name will be used as country on your device
+COUNTRY_ABBR="AUT" #three digit country abbreviation, see resources/LocatorConfig.xml from mkgmap for examples
 MAP_GRP="8324" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
 ISO="AT" # iso abbreviation of country
-#POLY="UpperAustria" # part of austria
+#POLY="UpperAustria" # part of Austria
 #POLY="Austria_Vicinity" # poly just to reduce data from openstreetbugs
 
 # Cut out a piece of Europe
@@ -36,5 +36,5 @@ ISO="AT" # iso abbreviation of country
 #POLY=Germany_Berlin
 
 
-# specifiy additional output formats like tdb (for viewing on an PC) or nsis for the Nullsoft Scriptable Installer System to later create a Mapsource installer
+# specify additional output formats like tdb (for viewing on an PC) or nsis for the Nullsoft Scriptable Installer System to later create a Mapsource installer
 MKGMAP_OPTION_TDBFILE="--tdbfile --nsis"

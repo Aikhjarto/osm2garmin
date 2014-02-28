@@ -20,7 +20,7 @@ POLY_DIR=$HOME"/osm/poly"
 
 # system settings
 #TEMP_DIR="$HOME/noBackup/osmtemp"
-TEMP_DIR=/scratch/osmtemp2
+TEMP_DIR=/scratch/osmtemp
 JAVA_RAM="8G" # max RAM memory available to java VM
 
 NICE_VAL="9" # values higher than 0 will reduce processor priority

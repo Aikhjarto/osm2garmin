@@ -1,23 +1,23 @@
 #!/bin/bash
 #This script is capable of downloading an OSM file and convert it to Garmin's img format. This can be used directly from an SD-Card in a Garmin device.
 #
-# If the script is interrupted (most probaly due to insufficient disc space or ram) it won't recalculate everything from scratch but will reuse all the non-erronous maps.
+# If the script is interrupted (most probably due to insufficient disc space or ram) it won't recalculate everything from scratch but will reuse all the non-erroneous maps.
 #
 # Thomas Wagner (wagner-thomas@gmx.at) Sept. 2012 - May 2013
 # 
 # This script comes with no warranty.
 #
 ### Known limitations
-# The reduce the computational demands of mkgmap, splitter is used to subdivide big maps into smaller ones that does not exeed a certain amound of nodes. Each of these smaller maps gets an individual, ascending number assigned. With the mkgmap argument "mapname" the start index can be shifted while generating a single map from the indivduals.  If you want to combine (and this script does this at the very end) several maps produced my mkgmap, you'll have to ensure by a propper start index that the map numbers will be unique in the final map. In this script, the difference of the start indices is 1000. This means you cannot reliable merge maps that have been split to 1000 or more maps. If you run into that problem, you can either adjust the start indicess manually or increase the maximum number of nodes of a submap.
+# The reduce the computational demands of mkgmap, splitter is used to subdivide big maps into smaller ones that does not exceed a certain amount of nodes. Each of these smaller maps gets an individual, ascending number assigned. With the mkgmap argument "mapname" the start index can be shifted while generating a single map from the individuals.  If you want to combine (and this script does this at the very end) several maps produced my mkgmap, you'll have to ensure by a proper start index that the map numbers will be unique in the final map. In this script, the difference of the start indices is 1000. This means you cannot reliable merge maps that have been split to 1000 or more maps. If you run into that problem, you can either adjust the start indicess manually or increase the maximum number of nodes of a submap.
 # 
-### Caution: memory and disc consumtion
-# As it is true for any script that handles huges osm datasets, this script will require lots of memory and harddisk space.
+### Caution: memory and disc consumption
+# As it is true for any script that handles huge osm datasets, this script will require lots of memory and harddisk space.
 # If you want to process a pbf file, you should consider the file size as requires memory and about 5 times the file size as available memory. (Note, that pbf is a heavily compressed filetype).
 
 # TODO: properly eval exit status of mkgmap and splitter (not mix up with exit status of java binary)
-# TODO: properly eval exit status of osmosis (is a java application invoced via bash script)
-# Known minor Bug: there is a rm-warning on puring already empty directories
-# Known Bug: if osmosis is interrupted (out of memory, hdd full, abort by CTRL-C) it leaves a near empty---but existing---pbf file. Uppon a consecutive execution of the script, osmosis isn't called again to finished it's job.
+# TODO: properly eval exit status of osmosis (is a java application invoked via bash script)
+# Known minor Bug: there is a rm-warning on purging already empty directories
+# Known Bug: if osmosis is interrupted (out of memory, hdd full, abort by CTRL-C) it leaves a near empty---but existing---pbf file. Upon a consecutive execution of the script, osmosis isn't called again to finished it's job.
 
 ##################### load map config ################################
 source osm_map_config.sh
@@ -57,7 +57,7 @@ OSMCONVERT_WORKDIR="$TEMP_DIR/osmconvert_tmp"
 #
 KEEP_TMP_FILE="" # if this string is empty, the temporary files will be kept
 ENABLE_PRECISE_CROP="y" # if string is not empty, "complete-ways" well be activated
-ENABLE_BOUNDS="y" # needed for address search capabilty
+ENABLE_BOUNDS="y" # needed for address search capability
 
 # command to import split files in mkgmap
 # Caution: with -c option in an un-preprocessed template.args file a lot of command line settings can be overwritten
@@ -153,7 +153,7 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 	fi
 
 	if [ ! -s "$OSM_SRC_FILE_PBF" ]; then
-		# geofabrik's URL is differnt between countries and continents
+		# geofabrik's URL is different between countries and continents
 		GEOFABRIK_FILE="$GEOFABRIK_MAP_NAME-latest.osm.pbf"
 		if [ "$GEOFABRIK_CONTINENT_NAME" == "" ]; then
 			DOWNLOAD_URL="http://download.geofabrik.de/openstreetmap/$GEOFABRIK_FILE"
@@ -206,7 +206,7 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 		
 				
 		if [ "$POLY" == "" ]; then
-			# download and convert in parallel does not work well. When input buffer of osmconvert is full, wget is stalled until osmconvert clears an procresses its buffer. This likely results in wget timeouts.
+			# download and convert in parallel does not work well. When input buffer of osmconvert is full, wget is stalled until osmconvert clears an processes its buffer. This likely results in wget timeouts.
 #			echo "download PBF and convert to o5m in parallel"
 #			wget -O - $DOWNLOAD_URL  | \
 #				tee $OSM_SRC_FILE_PBF | \
@@ -306,7 +306,7 @@ if [ ! -z $ENABLE_BOUNDS ]; then
 			fi 
 		fi
 		
-		# Cannot pipeline pbf to o5m convertion with filtering bounds since osmfilter needs random access to it's inputs.		
+		# Cannot pipeline pbf to o5m conversion with filtering bounds since osmfilter needs random access to it's inputs.		
 		echo "--->  extracting bounds info from map @"`date`
 		if [ "$OSM_SRC_FILE_O5M" -nt "$BOUNDS_FILE.o5m" ]; then
 			# extract boundary information from source 
@@ -660,7 +660,7 @@ else
 	echo "---> Alread there! @"`date`
 fi	
 
-### Max Speed (as osm is not fully populated with speed limity, you might want a seperate map to hide them)
+### Max Speed (as osm is not fully populated with speed limits, you might want a separate map to hide them)
 echo "--> gmaxspeed @"`date`
 if [ "$OSM_SRC_FILE_PBF" -nt "$MAXSPEED_DIR"/gmapsupp.img ]; then
 	if [ ! -d "$MAXSPEED_DIR" ]; then

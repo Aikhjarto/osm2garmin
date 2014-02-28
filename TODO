@@ -16,7 +16,7 @@ Improvements
 * mkgmap:road-speed, mkgmap:road-speed-max, mkgmap:road-speed-min
 
 * support input parameters rather than configuring by commenting codelines
-** (at least seperate config from script)
+** (at least separate config from script)
 
 * have a separate tmp folder for each map set
 
