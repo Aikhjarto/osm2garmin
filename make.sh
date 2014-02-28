@@ -193,7 +193,7 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 			fi
 		fi
 		
-		echo "---> start check of md5 checksum" 
+		echo "---> start check of md5 checksum @"`date`
 		DIR_OLD=`pwd`
 		cd $OSM_SRC_DIR
 		$MD5SUM_START $DEBUG_MD5 -c "$GEOFABRIK_FILE.md5" 
