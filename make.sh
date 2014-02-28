@@ -489,7 +489,6 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BIKE_DIR"/gmapsupp.img ]; then
 		--add-pois-to-areas --poi-address \
 		--make-all-cycleways --check-roundabouts \
 		--link-pois-to-ways --route --drive-on-right \
-		--ignore-maxspeeds \
 		--location-autofill=is_in,nearest \
 		--housenumbers \
 		$MKGMAP_OPTION_BOUNDS \
