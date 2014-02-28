@@ -135,6 +135,7 @@ OSMCONVERT_START="nice -n $NICE_VAL $OSMCONVERT_BIN"
 GMT_START="nice -n $NICE_VAL $GMT_BIN"
 JAVA_START="nice -n $NICE_VAL $JAVA_BIN"
 OSMOSIS_START="nice -n $NICE_VAL $OSMOSIS_BIN"
+MD5SUM_START="nice -n $NICE_VAL md5sum"
 
 # check for auxiliary files
 if [ ! -d $AIOSTYLES_DIR ]; then
@@ -195,7 +196,7 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 		echo "---> start check of md5 checksum" 
 		DIR_OLD=`pwd`
 		cd $OSM_SRC_DIR
-		md5sum $DEBUG_MD5 -c "$GEOFABRIK_FILE.md5" 
+		$MD5SUM_START $DEBUG_MD5 -c "$GEOFABRIK_FILE.md5" 
 		if [ $? -ne 0 ]; then
 			echo "ERROR: md5 check of map failed"; 
 			exit 1;
