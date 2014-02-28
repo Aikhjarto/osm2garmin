@@ -43,3 +43,7 @@ Stability and Compatibility
 * check what happens if one part of [ $1 -nt $2 ] is empty or missing
 
 * script cannot run in cygwin since the windows version of java cannot handle unix-style filenames
+
+* check if wget or curl is available
+
+* md5 check for downloads from geofabrik
