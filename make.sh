@@ -32,7 +32,7 @@ if [ ! -d "$TEMP_DIR/osmosis" ]; then
 fi
 export JAVACMD_OPTIONS="-Xmx$JAVA_RAM -server -Djava.io.tmpdir=$TEMP_DIR/osmosis" # java options for osmosis
 
-## parition the temporary directory
+## partition the temporary directory
 # temporary folders for separate maps
 DEFAULTMAP_DIR="$TEMP_DIR/gdefaultmap"
 BASEMAP_DIR="$TEMP_DIR/gbasemap"
