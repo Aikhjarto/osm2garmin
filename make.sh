@@ -265,7 +265,7 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 			
 			# abort if error (can crash frequently on low powered machines and huge input maps (e.g. a whole continent)
 			if [ $? -ne 0 ]; then
-				echo "ERROR: Osmosis crashed while appling polygon file! @"`date`
+				echo "ERROR: Osmosis crashed while applying polygon file! @"`date`
 				# remove partially created file (most of the time, just an empty file is created, but this interferes with the -nt tests in this script)
 				echo "---> Removing $OSM_SRC_FILE_PBF @"`date`
 				rm "$OSM_SRC_FILE_PBF"
