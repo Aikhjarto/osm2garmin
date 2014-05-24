@@ -376,7 +376,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$DEFAULTMAP_DIR"/gmapsupp.img ]; then
 		--series-name="OSM-Default-$ISO-bmap" --family-name=OSM --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"0001 --draw-priority=10 \
 		--add-pois-to-areas --poi-address \
-		--make-all-cycleways --check-roundabouts \
+		--make-opposite-cycleways --check-roundabouts \
 		--link-pois-to-ways --route --drive-on-right \
 		--process-destination --process-exits \
 		--location-autofill=is_in,nearest \
@@ -420,7 +420,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BASEMAP_DIR"/gmapsupp.img ]; then
 		--series-name="OSM-AllInOne-$ISO-bmap" --family-name=OSM --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"0001 --draw-priority=10 \
 		--add-pois-to-areas --poi-address \
-		--make-all-cycleways --check-roundabouts \
+		--make-opposite-cycleways --check-roundabouts \
 		--link-pois-to-ways --route --drive-on-right \
 		--process-destination --process-exits \
 		--location-autofill=is_in,nearest \
@@ -464,7 +464,7 @@ if [ "$OSM_SRC_FILE_PBF" -nt "$BIKE_DIR"/gmapsupp.img ]; then
 		--series-name="OSM-AllInOne-$ISO-bike" --family-name=OSM_BIKE --area-name=EU --latin1 \
 		--mapname="$MAP_GRP"0001 --draw-priority=10 \
 		--add-pois-to-areas --poi-address \
-		--make-all-cycleways --check-roundabouts \
+		--make-opposite-cycleways --check-roundabouts \
 		--link-pois-to-ways --route --drive-on-right \
 		--location-autofill=is_in,nearest \
 		--housenumbers \
