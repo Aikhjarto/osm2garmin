@@ -9,22 +9,30 @@
 # http://download.geofabrik.de/$GEOFABRIK_MAP_NAME.osm.pbf
 
 # Austria
-GEOFABRIK_CONTINENT_NAME="europe"
-GEOFABRIK_MAP_NAME="austria"
-COUNTRY_NAME="Austria" # This name will be used as country on your device
-COUNTRY_ABBR="AUT" #three digit country abbreviation, see resources/LocatorConfig.xml from mkgmap for examples
-MAP_GRP="8324" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
-ISO="AT" # iso abbreviation of country
+#GEOFABRIK_CONTINENT_NAME="europe"
+#GEOFABRIK_MAP_NAME="austria"
+#COUNTRY_NAME="Austria" # This name will be used as country on your device
+#COUNTRY_ABBR="AUT" #three digit country abbreviation, see resources/LocatorConfig.xml from mkgmap for examples
+#MAP_GRP="8324" # first 4 digits garmin uses to identify a map (default: 6324, so use another number)
+#ISO="AT" # iso abbreviation of country
 #POLY="UpperAustria" # part of Austria
 #POLY="Austria_Vicinity" # poly just to reduce data from openstreetbugs
 
 # Cut out a piece of Europe
-#GEOFABRIK_MAP_NAME="europe-latest"
+#GEOFABRIK_MAP_NAME="europe"
 #COUNTRY_NAME="AustriaVicinity"
 #COUNTRY_ABBR="EU"
 #MAP_GRP="6800"
 #ISO="EU"
 #POLY="Austria_Vicinity"
+
+# Cut out a piece of Europe
+GEOFABRIK_MAP_NAME="europe"
+COUNTRY_NAME="DACH"
+COUNTRY_ABBR="EU"
+MAP_GRP="6800"
+ISO="EU"
+POLY="DACH"
 
 # Germany
 #GEOFABRIK_CONTINENT_NAME="europe"

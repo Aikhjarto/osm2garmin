@@ -88,7 +88,11 @@ MKGMAP_FILE_IMPORT="$SPLITTER_DIR/*.pbf"
 # as of 2818: beautifyRoundabouts (enhanced placement of nodes to reduce bad angles)
 # as of 2827: change in labels mkgmap:label:1-4
 # as of 2906: merged the mergeroads branch. This makes maps better readable for the device but most likely is incomaptible with old style files (access, maxspeed and labels changed)
-
+# as of 3076: search is completely in UTF-8, thus special chars shouldn't be a problem any more
+# as of 3081: improved routing and smaller maps
+# as of 3175: better restriction handling
+# as of 3194: a new merger is used. Output may look differently.
+# as of 3258: performance enhancement
 
 ############################ the work starts here ###################
 
@@ -254,9 +258,7 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 					rm "$OSM_WGET_TMP_FILE"
 				fi
 			fi
-
 		fi
-
 	fi
 else
 	echo "---> Source map already present! @"`date`
@@ -488,47 +490,47 @@ else
 fi
 	
 ### PKW map
-echo "--> gpkw @"`date`
-if [ "$OSM_SRC_FILE_PBF" -nt "$PKW_DIR"/gmapsupp.img ]; then
-	if [ ! -d "$PKW_DIR" ]; then
-		mkdir -p "$PKW_DIR"
-		if [ $? -ne 0 ]; then
-			echo "ERROR: Couldn't create $PKW_DIR"
-			exit 1
-		fi
-	else
-		rm "$PKW_DIR"/*
-	fi
+# echo "--> gpkw @"`date`
+# if [ "$OSM_SRC_FILE_PBF" -nt "$PKW_DIR"/gmapsupp.img ]; then
+	# if [ ! -d "$PKW_DIR" ]; then
+		# mkdir -p "$PKW_DIR"
+		# if [ $? -ne 0 ]; then
+			# echo "ERROR: Couldn't create $PKW_DIR"
+			# exit 1
+		# fi
+	# else
+		# rm "$PKW_DIR"/*
+	# fi
 
-	$JAVA_START $XmxRAM -jar "$MKGMAP_JAR" --max-jobs --style-file="$AIOSTYLES_DIR"/pkw_style/ --description='Openstreetmap_PKW' \
-		--country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=4 --product-id=45 \
-		--series-name="OSM-AllInOne-$ISO-pkw" --family-name=OSM_PKW --area-name=EU --latin1 \
-		--mapname="$MAP_GRP"0001 --draw-priority=10 \
-		--add-pois-to-areas --poi-address \
-		--check-roundabouts \
-		--link-pois-to-ways --route --drive-on-right \
-		--process-destination --process-exits \
-		--location-autofill=is_in,nearest \
-		--housenumbers \
-		$MKGMAP_OPTION_BOUNDS \
-		$MKGMAP_OPTION_TDBFILE \
-		--gmapsupp "$TYP_DIR"/pkw.TYP \
-		--output-dir="$PKW_DIR" \
-		$MKGMAP_FILE_IMPORT \
-		$DEBUG_MKGMAP
+	# $JAVA_START $XmxRAM -jar "$MKGMAP_JAR" --max-jobs --style-file="$AIOSTYLES_DIR"/pkw_style/ --description='Openstreetmap_PKW' \
+		# --country-name=$COUNTRY_NAME --country-abbr=$COUNTRY_ABBR --family-id=4 --product-id=45 \
+		# --series-name="OSM-AllInOne-$ISO-pkw" --family-name=OSM_PKW --area-name=EU --latin1 \
+		# --mapname="$MAP_GRP"0001 --draw-priority=10 \
+		# --add-pois-to-areas --poi-address \
+		# --check-roundabouts \
+		# --link-pois-to-ways --route --drive-on-right \
+		# --process-destination --process-exits \
+		# --location-autofill=is_in,nearest \
+		# --housenumbers \
+		# $MKGMAP_OPTION_BOUNDS \
+		# $MKGMAP_OPTION_TDBFILE \
+		# --gmapsupp "$TYP_DIR"/pkw.TYP \
+		# --output-dir="$PKW_DIR" \
+		# $MKGMAP_FILE_IMPORT \
+		# $DEBUG_MKGMAP
 	
-	if [ ! -s "$PKW_DIR"/gmapsupp.img ]; then
-		echo "ERROR: pkw map could not be created"
-		exit 1
-	fi
+	# if [ ! -s "$PKW_DIR"/gmapsupp.img ]; then
+		# echo "ERROR: pkw map could not be created"
+		# exit 1
+	# fi
 
-	echo "---> size: " `du -hs "$PKW_DIR"` " " `du -hs "$PKW_DIR"/gmapsupp.img` " @"`date`
-	if [ "$KEEP_TMP_FILE" != "" ]; then	
-		rm "$PKW_DIR"/$MAP_GRP*.img # clean up, since mkgmap does not
-	fi
-else
-	echo "---> Already there! @"`date`
-fi
+	# echo "---> size: " `du -hs "$PKW_DIR"` " " `du -hs "$PKW_DIR"/gmapsupp.img` " @"`date`
+	# if [ "$KEEP_TMP_FILE" != "" ]; then	
+		# rm "$PKW_DIR"/$MAP_GRP*.img # clean up, since mkgmap does not
+	# fi
+# else
+	# echo "---> Already there! @"`date`
+# fi
 
 ### Addresses (Overlay map with pretty good visible address tags)
 echo "--> gaddr @"`date`
@@ -821,17 +823,17 @@ else
 	echo "----> gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 fi
 
-MAP_POSTFIX="pkw"
-echo "---> PKW @"`date`" postfix: "$MAP_POSTFIX
-if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
-	cp "$PKW_DIR"/gmapsupp.img "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img
-	if [ $? -ne 0 ]; then
-		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
-		exit 1
-	fi
-else
-	echo "----> gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
-fi
+# MAP_POSTFIX="pkw"
+# echo "---> PKW @"`date`" postfix: "$MAP_POSTFIX
+# if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
+	# cp "$PKW_DIR"/gmapsupp.img "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img
+	# if [ $? -ne 0 ]; then
+		# echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
+		# exit 1
+	# fi
+# else
+	# echo "----> gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+# fi
 
 MAP_POSTFIX="default_overlays"
 echo "---> Defaultmap @"`date`" postfix: "$MAP_POSTFIX
@@ -881,21 +883,21 @@ else
 	echo "----> gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
 fi
 
-MAP_POSTFIX="pkw_overlays"
-echo "---> PKW @"`date`" postfix: "$MAP_POSTFIX
-if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
-	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
-		"$PKW_DIR"/gmapsupp.img \
-		"$ADDR_DIR"/gmapsupp.img \
-		"$MAXSPEED_DIR"/gmapsupp.img \
-		"$BOUNDARY_DIR"/gmapsupp.img
-	if [ $? -ne 0 ]; then
-		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
-		exit 1
-	fi
-else
-	echo "----> gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
-fi
+#MAP_POSTFIX="pkw_overlays"
+#echo "---> PKW @"`date`" postfix: "$MAP_POSTFIX
+#if [ "$OSM_SRC_FILE_PBF" -nt "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img ]; then
+#	$GMT_START $DEBUG_GMT -jo "$GMAPOUT_DIR"/gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img \
+#		"$PKW_DIR"/gmapsupp.img \
+#		"$ADDR_DIR"/gmapsupp.img \
+#		"$MAXSPEED_DIR"/gmapsupp.img \
+#		"$BOUNDARY_DIR"/gmapsupp.img
+#	if [ $? -ne 0 ]; then
+#		echo "ERROR merging gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img!"
+#		exit 1
+#	fi
+#else
+#	echo "----> gmapsupp_"$COUNTRY_NAME"_"$MAP_POSTFIX".img is already there!"
+#fi
 
 if [ ! -z $OSBSQL_BIN ]; then
 	MAP_POSTFIX="base_with_bugs"
