@@ -65,34 +65,7 @@ ENABLE_BOUNDS="y" # needed for address search capability
 #MKGMAP_FILE_IMPORT="-c $SPLITTER_DIR/template.args"
 MKGMAP_FILE_IMPORT="$SPLITTER_DIR/*.pbf"
 
-##Hints for mkgmap:
-# somewhat between mkgmap 2338 and 2386 the option --no-poi-address became invalid
-# as of Dec 17th 2012 splitter r263 gots --keep-complete=true greatly enhances accuray of splitter with only slightly increased CPU and memory usage. (this option will possibly become default in future)
-# as of Dec 21th 2012 the o5m format is supported for reading (automatically) and writing (with --output=o5m) with splitter and mkgmap; o5m files are larger than pbf but faster to read (especially splitter will run significantly faster)
-# as of Dec 27th 2012 --remove-short-arcs is no longer needed by mkgmap (was previosly used to handle map errors but caused some routing problems)
-# as of Jan 10th 2013 --createboundsfile for correct address assignment is replaced by the BoundaryPreprocessor
-# as of r 2464 the documentation comes along with the sourcecode in  /trunk/docs
-# as of Mar 2013 Java 1.7 should be used
-# as of May 10th 2013 r2596 the legacy format for preprocessed bounds is dropped
-# as of 2636: overview maps are available
-# as of 2678: ignore-maxspeeds is removed
-# as of 2690: mkgmap:toll is available
-# as of 2701: Rename all mkgmap:access:* tags to mkgmap:* to make style files a bit shorter
-# as of 2705: some changes to default style file location were 
-# as of 2747: Add new addaccess and setaccess actions; mkgmap:access is no longer evaluated
-# as of 2760: java 1.7 is mandatory (1.6 support is dropped)
-# as of 2762: codepage for TYP and txt files is now UTF-8 per default. This makes --code-page pretty obsolete
-# as of 2763: mkgmap:bike to mkgmap:bicycle.
-# as of 2790: change in RoadMerger, check if --link-pois-to-ways still works
-# as of 2814: compare of names available name = $name:en { ... }
-# as of 2818: beautifyRoundabouts (enhanced placement of nodes to reduce bad angles)
-# as of 2827: change in labels mkgmap:label:1-4
-# as of 2906: merged the mergeroads branch. This makes maps better readable for the device but most likely is incomaptible with old style files (access, maxspeed and labels changed)
-# as of 3076: search is completely in UTF-8, thus special chars shouldn't be a problem any more
-# as of 3081: improved routing and smaller maps
-# as of 3175: better restriction handling
-# as of 3194: a new merger is used. Output may look differently.
-# as of 3258: performance enhancement
+
 
 ############################ the work starts here ###################
 
