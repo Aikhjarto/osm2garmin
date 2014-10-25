@@ -162,7 +162,7 @@ if [ ! -s "$OSM_SRC_FILE_O5M" ] || [ ! -s "$OSM_SRC_FILE_PBF" ]; then
 
 		# download actual map (check for existent file to allow manually copying rather than downloading)	
 		if [  ! -f "$OSM_SRC_DIR/$GEOFABRIK_FILE" ]; then
-			wget -O  "$OSM_SRC_DIR/$GEOFABRIK_FILE" "$DOWNLOAD_URL"
+			wget -q -O  "$OSM_SRC_DIR/$GEOFABRIK_FILE" "$DOWNLOAD_URL"
 			if [ $? -ne 0 ]; then
 				echo "ERROR: Download of $DOWNLOAD_URL to $OSM_SRC_DIR/$GEOFABRIK_FILE failed"
 				exit 1
