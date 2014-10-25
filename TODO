@@ -11,6 +11,8 @@ Features
 
 Improvements
 ============
+* remove dead-end symbols from map (overgrowded in dense residental eareas)
+
 * make styles optional (use mkgmap's internal default if not styles are available)
 
 * mkgmap:road-speed, mkgmap:road-speed-max, mkgmap:road-speed-min
