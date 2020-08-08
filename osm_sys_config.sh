@@ -20,7 +20,7 @@ POLY_DIR=$HOME"/osm/poly"
 
 # system settings
 TEMP_DIR=/scratch/osmtemp
-JAVA_RAM="9G" # max RAM memory available to java VM
+JAVA_RAM="5G" # max RAM memory available to java VM
 
 NICE_VAL="9" # values higher than 0 will reduce processor priority
 SPLITTER_MAX_NODES=1600000 # (default: 1600000) maximum number of nodes per file (splitter will split the whole map in according to this number)
@@ -33,21 +33,20 @@ SPLITTER_MAX_NODES=1600000 # (default: 1600000) maximum number of nodes per file
 # osmconvert (converter between nearly all important OSM data formats) from http://wiki.openstreetmap.org/wiki/Osmconvert
 # osmosis (used for cropping data) http://wiki.openstreetmap.org/wiki/Osmosis
 # osbsql2osm (used for converting openstreetbugs)  http://tuxcode.org/john/osbsql2osm/osbsql2osm-latest.tar.gz 
-SPLITTER_JAR="$APPS_DIR/splitter/splitter-r389/splitter.jar"
-#MKGMAP_JAR="$APPS_DIR/mkgmap/mkgmap-r2815/mkgmap.jar"
-MKGMAP_JAR="$APPS_DIR/mkgmap/mkgmap-r3280/mkgmap.jar"
-OSMFILTER_BIN="$APPS_DIR/osmfilter/osmfilter-1.2S/osmfilter"
-OSMCONVERT_BIN="$APPS_DIR/osmconvert/osmconvert-0.7T/osmconvert"
-GMT_BIN="$APPS_DIR/lgmt/lgmt08186/gmt"
+SPLITTER_JAR="$APPS_DIR/splitter/splitter-r597/splitter.jar"
+MKGMAP_JAR="$APPS_DIR/mkgmap/mkgmap-r4565/mkgmap.jar"
+OSMFILTER_BIN="$APPS_DIR/osmfilter/osmfilter-1.4.6/osmfilter"
+OSMCONVERT_BIN="$APPS_DIR/osmconvert/osmconvert-0.8.11/osmconvert"
+GMT_BIN="$APPS_DIR/lgmt/lgmt08220/gmt"
 JAVA_BIN="/usr/bin/java"
-OSMOSIS_BIN="$APPS_DIR/osmosis/osmosis-0.43.1/bin/osmosis"
+OSMOSIS_BIN="$APPS_DIR/osmosis/osmosis-0.48.2/bin/osmosis"
 #OSBSQL_BIN="$APPS_DIR/osbsql2osm/osbsql2osm-0.3.1/src/osbsql2osm" # if empty string, OSB will not be processed (but script will create useable maps)
 
 
 # output folder (use "." for current folder)
 #GMAPOUT_DIR="/pub/daten/transfer/OSM/test2815"
-GMAPOUT_DIR="/pub/daten/transfer/OSM/test3072_DACH"
-
+#GMAPOUT_DIR="/pub/daten/transfer/OSM/test3676"
+GMAPOUT_DIR=/scratch
 ################ internal settings ##################################
 # If nothing goes wrong, leave the defaults. Of course you can play around at your own risk.
 
